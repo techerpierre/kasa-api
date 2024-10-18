@@ -1,4 +1,4 @@
-package entities
+package domain
 
 type Accommodation struct {
 	ID               string

@@ -1,0 +1,10 @@
+package domain
+
+type UserPorts interface {
+	Create(data User) (User, error)
+	Update(id string, data User) (User, error)
+	Delete(id string) error
+	List(listing Listing) ([]User, uint64, error)
+	FindOne(id string) (User, error)
+	FindOneByEmail(email string) (User, error)
+}

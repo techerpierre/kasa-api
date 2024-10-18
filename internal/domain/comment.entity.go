@@ -1,4 +1,4 @@
-package entities
+package domain
 
 type Comment struct {
 	ID              string
