@@ -1,6 +1,6 @@
 package domain
 
-type CommentPorts interface {
+type CommentRepo interface {
 	Create(data Comment) (Comment, error)
 	Update(id string, data Comment) (Comment, error)
 	Delete(id string) error

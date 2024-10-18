@@ -1,6 +1,6 @@
 package domain
 
-type AuthorizationPorts interface {
+type AuthorizationsRepo interface {
 	Create(data Authorizations) (Authorizations, error)
 	Update(id AuthStatus, data Authorizations) (Authorizations, error)
 	Delete(id AuthStatus) error

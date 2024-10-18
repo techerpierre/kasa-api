@@ -1,6 +1,6 @@
 package domain
 
-type RatingPorts interface {
+type RatingRepo interface {
 	Create(data Rating) (Rating, error)
 	Update(id string, data Rating) (Rating, error)
 	Delete(id string) error

@@ -1,6 +1,6 @@
 package domain
 
-type BookingPorts interface {
+type BookingRepo interface {
 	Create(data Booking) (Booking, error)
 	Update(id string, data Booking) (Booking, error)
 	Delete(id string) error

@@ -1,6 +1,6 @@
 package domain
 
-type UserPorts interface {
+type UserRepo interface {
 	Create(data User) (User, error)
 	Update(id string, data User) (User, error)
 	Delete(id string) error
