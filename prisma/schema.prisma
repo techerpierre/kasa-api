@@ -25,13 +25,17 @@ model User {
   status AuthStatus @default(CLIENT)
   picture String?
   cover String?
+  authorizationsId AuthStatus
+  authorizations Authorizations @relation(fields: [authorizationsId], references: [id])
   accommodations Accommodation[]
+  bookings Booking[]
   ratings Rating[]
   comments Comment[]
 }
 
 model Authorizations {
   id AuthStatus @id @default(CLIENT)
+  users User[]
 }
 
 model Accommodation {
@@ -60,6 +64,8 @@ model Booking {
   end DateTime
   accommodationId String
   accommodation Accommodation @relation(fields: [accommodationId], references: [id])
+  clientId String
+  client User @relation(fields: [clientId], references: [id])
 }
 
 model Rating {
