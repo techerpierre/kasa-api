@@ -9,7 +9,7 @@ type User struct {
 	Status           AuthStatus
 	Picture          string
 	Cover            string
-	AuthorizationsID string
+	AuthorizationsID AuthStatus
 	Authorizations   Authorizations
 	Accomodations    []Accommodation
 	Bookings         []Booking

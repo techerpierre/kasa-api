@@ -1,9 +1,9 @@
 package domain
 
 type BookingRepo interface {
-	Create(data Booking) (Booking, error)
-	Update(id string, data Booking) (Booking, error)
-	Delete(id string) error
-	List(listing Listing) ([]Booking, int64, error)
-	FindOne(id string) (Booking, error)
+	Create(data Booking) (Booking, *HttpException)
+	Update(id string, data Booking) (Booking, *HttpException)
+	Delete(id string) *HttpException
+	List(listing Listing) ([]Booking, int64, *HttpException)
+	FindOne(id string) (Booking, *HttpException)
 }

@@ -10,22 +10,22 @@ func CreateRatingService(repo RatingRepo) *RatingService {
 	}
 }
 
-func (s *RatingService) Create(data Rating) (Rating, error) {
+func (s *RatingService) Create(data Rating) (Rating, *HttpException) {
 	return s.repo.Create(data)
 }
 
-func (s *RatingService) Update(id string, data Rating) (Rating, error) {
+func (s *RatingService) Update(id string, data Rating) (Rating, *HttpException) {
 	return s.repo.Update(id, data)
 }
 
-func (s *RatingService) Delete(id string) error {
+func (s *RatingService) Delete(id string) *HttpException {
 	return s.repo.Delete(id)
 }
 
-func (s *RatingService) List(listing Listing) ([]Rating, int64, error) {
+func (s *RatingService) List(listing Listing) ([]Rating, int64, *HttpException) {
 	return s.repo.List(listing)
 }
 
-func (s *RatingService) FindOne(id string) (Rating, error) {
+func (s *RatingService) FindOne(id string) (Rating, *HttpException) {
 	return s.repo.FindOne(id)
 }

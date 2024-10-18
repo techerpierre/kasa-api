@@ -1,10 +1,10 @@
 package domain
 
 type UserRepo interface {
-	Create(data User) (User, error)
-	Update(id string, data User) (User, error)
-	Delete(id string) error
-	List(listing Listing) ([]User, int64, error)
-	FindOne(id string) (User, error)
-	FindOneByEmail(email string) (User, error)
+	Create(data User) (User, *HttpException)
+	Update(id string, data User) (User, *HttpException)
+	Delete(id string) *HttpException
+	List(listing Listing) ([]User, int64, *HttpException)
+	FindOne(id string) (User, *HttpException)
+	FindOneByEmail(email string) (User, *HttpException)
 }
