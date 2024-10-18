@@ -15,3 +15,9 @@
     docker compose watch # To launch the API with the watcher.
     ```
 
+## Generate prisma models
+
+To generate prisma models, you must run the following command :
+```bash
+go run github.com/steebchen/prisma-client-go generate
+```
