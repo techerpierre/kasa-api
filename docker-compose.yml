@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: kasa
+      POSTGRES_PASSWORD: kasapassword
+      POSTGRES_DB: kasa
+    volumes:
+      - kasa-postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  api:
+    build: 
+      context: .
+    develop:
+      watch:
+      - action: sync+restart
+        target: /usr/src/app
+        path: ./
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: "postgresql://kasa:kasapassword@postgres:5432/kasa?schema=public"
+    depends_on:
+      - postgres
+
+volumes:
+  kasa-postgres-data:
