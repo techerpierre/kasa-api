@@ -5,5 +5,5 @@ type AccommodationRepo interface {
 	Update(id string, data Accommodation) (Accommodation, error)
 	Delete(id string) error
 	List(listing Listing) ([]Accommodation, int64, error)
-	FindOne(id string)
+	FindOne(id string) (Accommodation, error)
 }
