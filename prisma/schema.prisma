@@ -8,3 +8,74 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum AuthStatus {
+  CLIENT
+  OWNER
+  MODERATOR
+  ADMIN
+}
+
+model User {
+  id String @id @default(uuid())
+  email String
+  password String
+  firstname String
+  lastname String
+  status AuthStatus @default(CLIENT)
+  picture String?
+  cover String?
+  accommodations Accommodation[]
+  ratings Rating[]
+  comments Comment[]
+}
+
+model Authorizations {
+  id AuthStatus @id @default(CLIENT)
+}
+
+model Accommodation {
+  id String @id @default(uuid())
+  title String
+  description String
+  cover String
+  pictures String[]
+  adress String
+  additionalAdress String?
+  zip String
+  city String
+  country String
+  equipments String[]
+  tags String[]
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  ratings Rating[]
+  comments Comment[]
+  bookings Booking[]
+}
+
+model Booking {
+  id String @id @default(uuid())
+  start DateTime
+  end DateTime
+  accommodationId String
+  accommodation Accommodation @relation(fields: [accommodationId], references: [id])
+}
+
+model Rating {
+  id String @id @default(uuid())
+  value Int
+  accommodationId String
+  accommodation Accommodation @relation(fields: [accommodationId], references: [id])
+  userId String
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+  id String @id @default(uuid())
+  content String
+  accommodationId String
+  accommodation Accommodation @relation(fields: [accommodationId], references: [id])
+  userId String
+  user User @relation(fields: [userId], references: [id])
+}
