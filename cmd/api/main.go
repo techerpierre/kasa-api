@@ -15,8 +15,8 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	app.GET("/api/doc", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "hello"})
+	app.GET("/api/hello-world", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "Hello world !"})
 	})
 
 	app.Run(os.Getenv("PORT"))

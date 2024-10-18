@@ -12,6 +12,7 @@ services:
       - "5432:5432"
 
   kasa-api:
+    command: go run /usr/src/app/cmd/api
     build: 
       context: .
     develop:
