@@ -1,4 +1,4 @@
-package domain
+package entities
 
 type Authorizations struct {
 	ID    AuthStatus

@@ -1,4 +1,4 @@
-package domain
+package entities
 
 type Listing struct {
 	Page     int64
