@@ -6,31 +6,31 @@ import (
 )
 
 type CommentService struct {
-	repo ports.CommentRepo
+	output ports.CommentOutput
 }
 
-func CreateCommentService(repo ports.CommentRepo) *CommentService {
+func CreateCommentService(output ports.CommentOutput) *CommentService {
 	return &CommentService{
-		repo: repo,
+		output: output,
 	}
 }
 
 func (s *CommentService) Create(data entities.Comment) (entities.Comment, *entities.Exception) {
-	return s.repo.Create(data)
+	return s.output.Create(data)
 }
 
 func (s *CommentService) Update(id string, data entities.Comment) (entities.Comment, *entities.Exception) {
-	return s.repo.Update(id, data)
+	return s.output.Update(id, data)
 }
 
 func (s *CommentService) Delete(id string) *entities.Exception {
-	return s.repo.Delete(id)
+	return s.output.Delete(id)
 }
 
 func (s *CommentService) List(listing entities.Listing) ([]entities.Comment, int64, *entities.Exception) {
-	return s.repo.List(listing)
+	return s.output.List(listing)
 }
 
 func (s *CommentService) FindOne(id string) (entities.Comment, *entities.Exception) {
-	return s.repo.FindOne(id)
+	return s.output.FindOne(id)
 }

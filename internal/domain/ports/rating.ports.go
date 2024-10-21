@@ -2,7 +2,7 @@ package ports
 
 import "github.com/techerpierre/kasa-api/internal/domain/entities"
 
-type RatingRepo interface {
+type RatingOutput interface {
 	Create(data entities.Rating) (entities.Rating, *entities.Exception)
 	Update(id string, data entities.Rating) (entities.Rating, *entities.Exception)
 	Delete(id string) *entities.Exception

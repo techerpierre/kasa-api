@@ -6,31 +6,31 @@ import (
 )
 
 type UserService struct {
-	repo ports.UserRepo
+	output ports.UserOutput
 }
 
-func CreateUserService(repo ports.UserRepo) *UserService {
+func CreateUserService(output ports.UserOutput) *UserService {
 	return &UserService{
-		repo: repo,
+		output: output,
 	}
 }
 
 func (s *UserService) Create(data entities.User) (entities.User, *entities.Exception) {
-	return s.repo.Create(data)
+	return s.output.Create(data)
 }
 
 func (s *UserService) Update(id string, data entities.User) (entities.User, *entities.Exception) {
-	return s.repo.Update(id, data)
+	return s.output.Update(id, data)
 }
 
 func (s *UserService) Delete(id string) *entities.Exception {
-	return s.repo.Delete(id)
+	return s.output.Delete(id)
 }
 
 func (s *UserService) List(listing entities.Listing) ([]entities.User, int64, *entities.Exception) {
-	return s.repo.List(listing)
+	return s.output.List(listing)
 }
 
 func (s *UserService) FindOne(id string) (entities.User, *entities.Exception) {
-	return s.repo.FindOne(id)
+	return s.output.FindOne(id)
 }

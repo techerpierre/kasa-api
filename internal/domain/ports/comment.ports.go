@@ -2,7 +2,7 @@ package ports
 
 import "github.com/techerpierre/kasa-api/internal/domain/entities"
 
-type CommentRepo interface {
+type CommentOutput interface {
 	Create(data entities.Comment) (entities.Comment, *entities.Exception)
 	Update(id string, data entities.Comment) (entities.Comment, *entities.Exception)
 	Delete(id string) *entities.Exception

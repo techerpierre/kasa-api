@@ -2,7 +2,7 @@ package ports
 
 import "github.com/techerpierre/kasa-api/internal/domain/entities"
 
-type AccommodationRepo interface {
+type AccommodationOutput interface {
 	Create(data entities.Accommodation) (entities.Accommodation, *entities.Exception)
 	Update(id string, data entities.Accommodation) (entities.Accommodation, *entities.Exception)
 	Delete(id string) *entities.Exception

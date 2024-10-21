@@ -6,31 +6,31 @@ import (
 )
 
 type RatingService struct {
-	repo ports.RatingRepo
+	output ports.RatingOutput
 }
 
-func CreateRatingService(repo ports.RatingRepo) *RatingService {
+func CreateRatingService(output ports.RatingOutput) *RatingService {
 	return &RatingService{
-		repo: repo,
+		output: output,
 	}
 }
 
 func (s *RatingService) Create(data entities.Rating) (entities.Rating, *entities.Exception) {
-	return s.repo.Create(data)
+	return s.output.Create(data)
 }
 
 func (s *RatingService) Update(id string, data entities.Rating) (entities.Rating, *entities.Exception) {
-	return s.repo.Update(id, data)
+	return s.output.Update(id, data)
 }
 
 func (s *RatingService) Delete(id string) *entities.Exception {
-	return s.repo.Delete(id)
+	return s.output.Delete(id)
 }
 
 func (s *RatingService) List(listing entities.Listing) ([]entities.Rating, int64, *entities.Exception) {
-	return s.repo.List(listing)
+	return s.output.List(listing)
 }
 
 func (s *RatingService) FindOne(id string) (entities.Rating, *entities.Exception) {
-	return s.repo.FindOne(id)
+	return s.output.FindOne(id)
 }

@@ -6,31 +6,31 @@ import (
 )
 
 type BookingService struct {
-	repo ports.BookingRepo
+	output ports.BookingOutput
 }
 
-func CreateBookingService(repo ports.BookingRepo) *BookingService {
+func CreateBookingService(output ports.BookingOutput) *BookingService {
 	return &BookingService{
-		repo: repo,
+		output: output,
 	}
 }
 
 func (s *BookingService) Create(data entities.Booking) (entities.Booking, *entities.Exception) {
-	return s.repo.Create(data)
+	return s.output.Create(data)
 }
 
 func (s *BookingService) Update(id string, data entities.Booking) (entities.Booking, *entities.Exception) {
-	return s.repo.Update(id, data)
+	return s.output.Update(id, data)
 }
 
 func (s *BookingService) Delete(id string) *entities.Exception {
-	return s.repo.Delete(id)
+	return s.output.Delete(id)
 }
 
 func (s *BookingService) List(listing entities.Listing) ([]entities.Booking, int64, *entities.Exception) {
-	return s.repo.List(listing)
+	return s.output.List(listing)
 }
 
 func (s *BookingService) FindOne(id string) (entities.Booking, *entities.Exception) {
-	return s.repo.FindOne(id)
+	return s.output.FindOne(id)
 }

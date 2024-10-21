@@ -2,7 +2,7 @@ package ports
 
 import "github.com/techerpierre/kasa-api/internal/domain/entities"
 
-type UserRepo interface {
+type UserOutput interface {
 	Create(data entities.User) (entities.User, *entities.Exception)
 	Update(id string, data entities.User) (entities.User, *entities.Exception)
 	Delete(id string) *entities.Exception

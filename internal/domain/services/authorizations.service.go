@@ -6,31 +6,31 @@ import (
 )
 
 type AuthorizationsService struct {
-	repo ports.AuthorizationsRepo
+	output ports.AuthorizationsOutput
 }
 
-func CreateAuthorizationsService(repo ports.AuthorizationsRepo) *AuthorizationsService {
+func CreateAuthorizationsService(output ports.AuthorizationsOutput) *AuthorizationsService {
 	return &AuthorizationsService{
-		repo: repo,
+		output: output,
 	}
 }
 
 func (s *AuthorizationsService) Create(data entities.Authorizations) (entities.Authorizations, *entities.Exception) {
-	return s.repo.Create(data)
+	return s.output.Create(data)
 }
 
 func (s *AuthorizationsService) Update(id entities.AuthStatus, data entities.Authorizations) (entities.Authorizations, *entities.Exception) {
-	return s.repo.Update(id, data)
+	return s.output.Update(id, data)
 }
 
 func (s *AuthorizationsService) Delete(id entities.AuthStatus) *entities.Exception {
-	return s.repo.Delete(id)
+	return s.output.Delete(id)
 }
 
 func (s *AuthorizationsService) List() ([]entities.Authorizations, int64, *entities.Exception) {
-	return s.repo.List()
+	return s.output.List()
 }
 
 func (s *AuthorizationsService) FindOne(id entities.AuthStatus) (entities.Authorizations, *entities.Exception) {
-	return s.repo.FindOne(id)
+	return s.output.FindOne(id)
 }
