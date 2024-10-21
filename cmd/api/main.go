@@ -2,10 +2,9 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 
-	"github.com/gin-gonic/gin"
+	db "github.com/techerpierre/kasa-api/models"
 )
 
 func main() {
@@ -15,9 +14,21 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	app.GET("/api/hello-world", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "Hello world !"})
-	})
+	prisma := db.NewClient(
+		db.WithDatasourceURL(os.Getenv("DATABASE_URL")),
+	)
+
+	if err := prisma.Prisma.Connect(); err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err := prisma.Prisma.Disconnect(); err != nil {
+			panic(err)
+		}
+	}()
+
+	Instanciate(app, prisma)
 
 	app.Run(os.Getenv("PORT"))
 }
