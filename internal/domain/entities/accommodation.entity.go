@@ -7,7 +7,7 @@ type Accommodation struct {
 	Cover            string
 	Pictures         []string
 	Adress           string
-	AdditionalAdress string
+	AdditionalAdress *string
 	Zip              string
 	City             string
 	Country          string

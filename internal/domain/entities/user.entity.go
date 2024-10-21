@@ -7,8 +7,8 @@ type User struct {
 	Firstname        string
 	Lastname         string
 	Status           AuthStatus
-	Picture          string
-	Cover            string
+	Picture          *string
+	Cover            *string
 	AuthorizationsID AuthStatus
 	Authorizations   Authorizations
 	Accomodations    []Accommodation
