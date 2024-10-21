@@ -9,3 +9,11 @@ type AuthorizationsOutput interface {
 	List() ([]entities.Authorizations, int64, *entities.Exception)
 	FindOne(id entities.AuthStatus) (entities.Authorizations, *entities.Exception)
 }
+
+type AuthorizationsInput interface {
+	Create(data entities.Authorizations) (entities.Authorizations, *entities.Exception)
+	Update(id entities.AuthStatus, data entities.Authorizations) (entities.Authorizations, *entities.Exception)
+	Delete(id entities.AuthStatus) *entities.Exception
+	List() ([]entities.Authorizations, int64, *entities.Exception)
+	FindOne(id entities.AuthStatus) (entities.Authorizations, *entities.Exception)
+}
