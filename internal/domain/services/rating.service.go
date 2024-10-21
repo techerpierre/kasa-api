@@ -15,22 +15,22 @@ func CreateRatingService(repo ports.RatingRepo) *RatingService {
 	}
 }
 
-func (s *RatingService) Create(data entities.Rating) (entities.Rating, *entities.HttpException) {
+func (s *RatingService) Create(data entities.Rating) (entities.Rating, *entities.Exception) {
 	return s.repo.Create(data)
 }
 
-func (s *RatingService) Update(id string, data entities.Rating) (entities.Rating, *entities.HttpException) {
+func (s *RatingService) Update(id string, data entities.Rating) (entities.Rating, *entities.Exception) {
 	return s.repo.Update(id, data)
 }
 
-func (s *RatingService) Delete(id string) *entities.HttpException {
+func (s *RatingService) Delete(id string) *entities.Exception {
 	return s.repo.Delete(id)
 }
 
-func (s *RatingService) List(listing entities.Listing) ([]entities.Rating, int64, *entities.HttpException) {
+func (s *RatingService) List(listing entities.Listing) ([]entities.Rating, int64, *entities.Exception) {
 	return s.repo.List(listing)
 }
 
-func (s *RatingService) FindOne(id string) (entities.Rating, *entities.HttpException) {
+func (s *RatingService) FindOne(id string) (entities.Rating, *entities.Exception) {
 	return s.repo.FindOne(id)
 }

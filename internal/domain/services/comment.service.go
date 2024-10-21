@@ -15,22 +15,22 @@ func CreateCommentService(repo ports.CommentRepo) *CommentService {
 	}
 }
 
-func (s *CommentService) Create(data entities.Comment) (entities.Comment, *entities.HttpException) {
+func (s *CommentService) Create(data entities.Comment) (entities.Comment, *entities.Exception) {
 	return s.repo.Create(data)
 }
 
-func (s *CommentService) Update(id string, data entities.Comment) (entities.Comment, *entities.HttpException) {
+func (s *CommentService) Update(id string, data entities.Comment) (entities.Comment, *entities.Exception) {
 	return s.repo.Update(id, data)
 }
 
-func (s *CommentService) Delete(id string) *entities.HttpException {
+func (s *CommentService) Delete(id string) *entities.Exception {
 	return s.repo.Delete(id)
 }
 
-func (s *CommentService) List(listing entities.Listing) ([]entities.Comment, int64, *entities.HttpException) {
+func (s *CommentService) List(listing entities.Listing) ([]entities.Comment, int64, *entities.Exception) {
 	return s.repo.List(listing)
 }
 
-func (s *CommentService) FindOne(id string) (entities.Comment, *entities.HttpException) {
+func (s *CommentService) FindOne(id string) (entities.Comment, *entities.Exception) {
 	return s.repo.FindOne(id)
 }

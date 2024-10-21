@@ -15,22 +15,22 @@ func CreateBookingService(repo ports.BookingRepo) *BookingService {
 	}
 }
 
-func (s *BookingService) Create(data entities.Booking) (entities.Booking, *entities.HttpException) {
+func (s *BookingService) Create(data entities.Booking) (entities.Booking, *entities.Exception) {
 	return s.repo.Create(data)
 }
 
-func (s *BookingService) Update(id string, data entities.Booking) (entities.Booking, *entities.HttpException) {
+func (s *BookingService) Update(id string, data entities.Booking) (entities.Booking, *entities.Exception) {
 	return s.repo.Update(id, data)
 }
 
-func (s *BookingService) Delete(id string) *entities.HttpException {
+func (s *BookingService) Delete(id string) *entities.Exception {
 	return s.repo.Delete(id)
 }
 
-func (s *BookingService) List(listing entities.Listing) ([]entities.Booking, int64, *entities.HttpException) {
+func (s *BookingService) List(listing entities.Listing) ([]entities.Booking, int64, *entities.Exception) {
 	return s.repo.List(listing)
 }
 
-func (s *BookingService) FindOne(id string) (entities.Booking, *entities.HttpException) {
+func (s *BookingService) FindOne(id string) (entities.Booking, *entities.Exception) {
 	return s.repo.FindOne(id)
 }
