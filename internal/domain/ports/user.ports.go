@@ -17,5 +17,4 @@ type UserInput interface {
 	Delete(id string) *entities.Exception
 	List(listing entities.Listing) ([]entities.User, int64, *entities.Exception)
 	FindOne(id string) (entities.User, *entities.Exception)
-	FindOneByEmail(email string) (entities.User, *entities.Exception)
 }
