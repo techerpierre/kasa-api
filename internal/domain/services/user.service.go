@@ -1,4 +1,4 @@
-package domain
+package services
 
 import (
 	"github.com/techerpierre/kasa-api/internal/domain/entities"
