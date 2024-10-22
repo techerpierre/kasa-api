@@ -27,7 +27,7 @@ func (a *RatingAPI) Delete(id string) *entities.Exception {
 	return a.service.Delete(id)
 }
 
-func (a *RatingAPI) List(listing entities.Listing) ([]entities.Rating, int64, *entities.Exception) {
+func (a *RatingAPI) List(listing entities.Listing) ([]entities.Rating, int, *entities.Exception) {
 	return a.service.List(listing)
 }
 

@@ -91,8 +91,8 @@ func (r *UserRepository) Delete(id string) *entities.Exception {
 
 	if err != nil {
 		return entities.CreateException(
-			entities.ExceptionCode_BadInputFormat,
-			entities.ExceptionMessage_BadInputFormat,
+			entities.ExceptionCode_NotHandledError,
+			entities.ExceptionMessage_NotHandledError,
 		)
 	}
 
@@ -112,7 +112,7 @@ func (r *UserRepository) List(listing entities.Listing) ([]entities.User, int, *
 	}
 
 	countResult, err := r.prisma.Prisma.ExecuteRaw(
-		"SELECT COUNT(*) FROM USER",
+		`SELECT COUNT(*) FROM "User"`,
 	).Exec(context.Background())
 
 	if err != nil {
