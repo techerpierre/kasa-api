@@ -1,7 +1,7 @@
 package entities
 
 type Listing struct {
-	Page     int64
-	Pagesize int64
+	Page     int
+	Pagesize int
 	Filters  []Filter
 }

@@ -27,7 +27,7 @@ func (s *UserService) Delete(id string) *entities.Exception {
 	return s.output.Delete(id)
 }
 
-func (s *UserService) List(listing entities.Listing) ([]entities.User, int64, *entities.Exception) {
+func (s *UserService) List(listing entities.Listing) ([]entities.User, int, *entities.Exception) {
 	return s.output.List(listing)
 }
 
