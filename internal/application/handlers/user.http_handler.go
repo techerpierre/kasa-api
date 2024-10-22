@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/techerpierre/kasa-api/internal/application/dto"
@@ -108,7 +109,26 @@ func (h *UserHTTPHandler) Delete(c *gin.Context) {
 
 func (h *UserHTTPHandler) List(c *gin.Context) {
 
-	var listing entities.Listing
+	page, err := strconv.Atoi(c.DefaultQuery("page", "0"))
+
+	if err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": `The "page" query must be an integer.`}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	pagesize, err := strconv.Atoi(c.DefaultQuery("pagesize", "10"))
+
+	if err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": `The "pagesize" query must be an integer.`}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	listing := entities.Listing{
+		Page:     page,
+		Pagesize: pagesize,
+	}
 
 	users, count, exception := h.api.List(listing)
 
