@@ -78,7 +78,7 @@ func (r *AuthorizationsRepository) List() ([]entities.Authorizations, int, *enti
 	}
 
 	countResult, err := r.prisma.Prisma.ExecuteRaw(
-		`SELECT COUNT(*) FROM "Authorizations"`,
+		`SELECT COUNT(*) FROM Authorizations`,
 	).Exec(context.Background())
 
 	if err != nil {

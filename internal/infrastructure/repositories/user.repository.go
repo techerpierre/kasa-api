@@ -112,7 +112,7 @@ func (r *UserRepository) List(listing entities.Listing) ([]entities.User, int, *
 	}
 
 	countResult, err := r.prisma.Prisma.ExecuteRaw(
-		`SELECT COUNT(*) FROM "User"`,
+		`SELECT COUNT(*) FROM User`,
 	).Exec(context.Background())
 
 	if err != nil {
