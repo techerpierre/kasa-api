@@ -1,4 +1,4 @@
-FROM golang:1.22.3
+FROM golang:latest
 
 WORKDIR /usr/src/app
 
@@ -11,3 +11,5 @@ RUN go run github.com/steebchen/prisma-client-go generate
 #RUN go build -o api ./cmd/api
 
 EXPOSE 8080
+
+CMD ["go", "run", "./cmd/api"]
