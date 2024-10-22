@@ -19,11 +19,11 @@ func (*AuthorizationsRepository) Create(data entities.Authorizations) (entities.
 	return entities.Authorizations{}, nil
 }
 
-func (*AuthorizationsRepository) Update(id entities.AuthStatus, data entities.Authorizations) (entities.Authorizations, *entities.Exception) {
+func (*AuthorizationsRepository) Update(id string, data entities.Authorizations) (entities.Authorizations, *entities.Exception) {
 	return entities.Authorizations{}, nil
 }
 
-func (*AuthorizationsRepository) Delete(id entities.AuthStatus) *entities.Exception {
+func (*AuthorizationsRepository) Delete(id string) *entities.Exception {
 	return nil
 }
 
@@ -31,6 +31,6 @@ func (*AuthorizationsRepository) List() ([]entities.Authorizations, int64, *enti
 	return nil, 0, nil
 }
 
-func (*AuthorizationsRepository) FindOne(id entities.AuthStatus) (entities.Authorizations, *entities.Exception) {
+func (*AuthorizationsRepository) FindOne(id string) (entities.Authorizations, *entities.Exception) {
 	return entities.Authorizations{}, nil
 }

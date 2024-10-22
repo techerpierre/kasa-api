@@ -9,23 +9,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum AuthStatus {
-  CLIENT
-  OWNER
-  MODERATOR
-  ADMIN
-}
-
 model User {
   id String @id @default(uuid())
   email String @unique
   password String
   firstname String
   lastname String
-  status AuthStatus @default(CLIENT)
   picture String?
   cover String?
-  authorizationsId AuthStatus
+  authorizationsId String
   authorizations Authorizations @relation(fields: [authorizationsId], references: [id])
   accommodations Accommodation[]
   bookings Booking[]
@@ -34,7 +26,7 @@ model User {
 }
 
 model Authorizations {
-  id AuthStatus @id @default(CLIENT)
+  id String @id
   users User[]
 }
 

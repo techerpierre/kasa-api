@@ -19,11 +19,11 @@ func (s *AuthorizationsService) Create(data entities.Authorizations) (entities.A
 	return s.output.Create(data)
 }
 
-func (s *AuthorizationsService) Update(id entities.AuthStatus, data entities.Authorizations) (entities.Authorizations, *entities.Exception) {
+func (s *AuthorizationsService) Update(id string, data entities.Authorizations) (entities.Authorizations, *entities.Exception) {
 	return s.output.Update(id, data)
 }
 
-func (s *AuthorizationsService) Delete(id entities.AuthStatus) *entities.Exception {
+func (s *AuthorizationsService) Delete(id string) *entities.Exception {
 	return s.output.Delete(id)
 }
 
@@ -31,6 +31,6 @@ func (s *AuthorizationsService) List() ([]entities.Authorizations, int64, *entit
 	return s.output.List()
 }
 
-func (s *AuthorizationsService) FindOne(id entities.AuthStatus) (entities.Authorizations, *entities.Exception) {
+func (s *AuthorizationsService) FindOne(id string) (entities.Authorizations, *entities.Exception) {
 	return s.output.FindOne(id)
 }

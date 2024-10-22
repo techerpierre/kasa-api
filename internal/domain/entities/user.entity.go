@@ -6,10 +6,9 @@ type User struct {
 	Password         string
 	Firstname        string
 	Lastname         string
-	Status           AuthStatus
 	Picture          *string
 	Cover            *string
-	AuthorizationsID AuthStatus
+	AuthorizationsID string
 	Authorizations   Authorizations
 	Accomodations    []Accommodation
 	Bookings         []Booking

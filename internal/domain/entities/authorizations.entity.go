@@ -1,6 +1,6 @@
 package entities
 
 type Authorizations struct {
-	ID    AuthStatus
+	ID    string
 	Users []User
 }

@@ -19,11 +19,11 @@ func (a *AuthorizationAPI) Create(data entities.Authorizations) (entities.Author
 	return a.service.Create(data)
 }
 
-func (a *AuthorizationAPI) Update(id entities.AuthStatus, data entities.Authorizations) (entities.Authorizations, *entities.Exception) {
+func (a *AuthorizationAPI) Update(id string, data entities.Authorizations) (entities.Authorizations, *entities.Exception) {
 	return a.service.Update(id, data)
 }
 
-func (a *AuthorizationAPI) Delete(id entities.AuthStatus) *entities.Exception {
+func (a *AuthorizationAPI) Delete(id string) *entities.Exception {
 	return a.service.Delete(id)
 }
 
@@ -31,6 +31,6 @@ func (a *AuthorizationAPI) List() ([]entities.Authorizations, int64, *entities.E
 	return a.service.List()
 }
 
-func (a *AuthorizationAPI) FindOne(id entities.AuthStatus) (entities.Authorizations, *entities.Exception) {
+func (a *AuthorizationAPI) FindOne(id string) (entities.Authorizations, *entities.Exception) {
 	return a.service.FindOne(id)
 }
