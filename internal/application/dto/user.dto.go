@@ -10,11 +10,6 @@ type UserDTO struct {
 	Picture          *string `json:"picture"`
 	Cover            *string `json:"cover"`
 	AuthorizationsID string  `json:"authorizationsId"`
-	Authorizations   any     `json:"authorizations"`
-	Accomodations    []any   `json:"accomodations"`
-	Bookings         []any   `json:"bookings"`
-	Ratings          []any   `json:"ratings"`
-	Comments         []any   `json:"comments"`
 }
 
 type UserInputDTO struct {
@@ -35,9 +30,4 @@ func PipeUserInDTO(source *entities.User, target *UserDTO) {
 	target.Picture = source.Picture
 	target.Cover = source.Cover
 	target.AuthorizationsID = source.AuthorizationsID
-	target.Authorizations = source.Authorizations
-	target.Accomodations = nil
-	target.Bookings = nil
-	target.Ratings = nil
-	target.Comments = nil
 }
