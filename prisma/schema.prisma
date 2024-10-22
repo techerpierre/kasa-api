@@ -41,6 +41,7 @@ model Accommodation {
   zip String
   city String
   country String
+  active Boolean
   equipments String[]
   tags String[]
   userId String

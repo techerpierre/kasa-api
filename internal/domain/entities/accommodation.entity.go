@@ -11,6 +11,7 @@ type Accommodation struct {
 	Zip              string
 	City             string
 	Country          string
+	Active           bool
 	Equipments       []string
 	Tags             []string
 	UserID           string
