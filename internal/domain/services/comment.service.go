@@ -27,7 +27,7 @@ func (s *CommentService) Delete(id string) *entities.Exception {
 	return s.output.Delete(id)
 }
 
-func (s *CommentService) List(listing entities.Listing) ([]entities.Comment, int64, *entities.Exception) {
+func (s *CommentService) List(listing entities.Listing) ([]entities.Comment, int, *entities.Exception) {
 	return s.output.List(listing)
 }
 

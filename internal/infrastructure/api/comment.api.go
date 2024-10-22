@@ -27,7 +27,7 @@ func (a *CommentAPI) Delete(id string) *entities.Exception {
 	return a.service.Delete(id)
 }
 
-func (a *CommentAPI) List(listing entities.Listing) ([]entities.Comment, int64, *entities.Exception) {
+func (a *CommentAPI) List(listing entities.Listing) ([]entities.Comment, int, *entities.Exception) {
 	return a.service.List(listing)
 }
 

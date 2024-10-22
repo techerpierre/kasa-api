@@ -27,7 +27,7 @@ func (*AuthorizationsRepository) Delete(id string) *entities.Exception {
 	return nil
 }
 
-func (*AuthorizationsRepository) List() ([]entities.Authorizations, int64, *entities.Exception) {
+func (*AuthorizationsRepository) List() ([]entities.Authorizations, int, *entities.Exception) {
 	return nil, 0, nil
 }
 

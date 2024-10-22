@@ -27,7 +27,7 @@ func (a *AccommodationAPI) Delete(id string) *entities.Exception {
 	return a.service.Delete(id)
 }
 
-func (a *AccommodationAPI) List(listing entities.Listing) ([]entities.Accommodation, int64, *entities.Exception) {
+func (a *AccommodationAPI) List(listing entities.Listing) ([]entities.Accommodation, int, *entities.Exception) {
 	return a.service.List(listing)
 }
 

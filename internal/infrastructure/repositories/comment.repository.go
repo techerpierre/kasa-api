@@ -1,7 +1,10 @@
 package repositories
 
 import (
+	"context"
+
 	"github.com/techerpierre/kasa-api/internal/domain/entities"
+	"github.com/techerpierre/kasa-api/internal/helpers"
 	db "github.com/techerpierre/kasa-api/models"
 )
 
@@ -15,22 +18,135 @@ func CreateCommentRepository(prisma *db.PrismaClient) *CommentRepository {
 	}
 }
 
-func (*CommentRepository) Create(data entities.Comment) (entities.Comment, *entities.Exception) {
-	return entities.Comment{}, nil
+func (r *CommentRepository) Create(data entities.Comment) (entities.Comment, *entities.Exception) {
+	result, err := r.prisma.Comment.CreateOne(
+		db.Comment.Content.SetIfPresent(helpers.NilIfEmptyString(data.Content)),
+		db.Comment.Accommodation.Link(
+			db.Accommodation.ID.EqualsIfPresent(helpers.NilIfEmptyString(data.AccommodationID)),
+		),
+		db.Comment.User.Link(
+			db.User.ID.EqualsIfPresent(helpers.NilIfEmptyString(data.UserID)),
+		),
+	).Exec(context.Background())
+
+	if err != nil {
+		return entities.Comment{}, entities.CreateException(
+			entities.ExceptionCode_BadInputFormat,
+			entities.ExceptionMessage_BadInputFormat,
+		)
+	}
+
+	return entities.Comment{
+		ID:              result.ID,
+		Content:         result.Content,
+		AccommodationID: result.AccommodationID,
+		UserID:          result.UserID,
+	}, nil
 }
 
-func (*CommentRepository) Update(id string, data entities.Comment) (entities.Comment, *entities.Exception) {
-	return entities.Comment{}, nil
+func (r *CommentRepository) Update(id string, data entities.Comment) (entities.Comment, *entities.Exception) {
+	result, err := r.prisma.Comment.FindUnique(
+		db.Comment.ID.Equals(id),
+	).Update(
+		db.Comment.Content.SetIfPresent(helpers.NilIfEmptyString(data.Content)),
+		db.Comment.Accommodation.Link(
+			db.Accommodation.ID.EqualsIfPresent(helpers.NilIfEmptyString(data.AccommodationID)),
+		),
+		db.Comment.User.Link(
+			db.User.ID.EqualsIfPresent(helpers.NilIfEmptyString(data.UserID)),
+		),
+	).Exec(context.Background())
+
+	if err != nil {
+		return entities.Comment{}, entities.CreateException(
+			entities.ExceptionCode_BadInputFormat,
+			entities.ExceptionMessage_BadInputFormat,
+		)
+	}
+
+	return entities.Comment{
+		ID:              result.ID,
+		Content:         result.Content,
+		AccommodationID: result.AccommodationID,
+		UserID:          result.UserID,
+	}, nil
 }
 
-func (*CommentRepository) Delete(id string) *entities.Exception {
+func (r *CommentRepository) Delete(id string) *entities.Exception {
+	_, err := r.prisma.Comment.FindUnique(
+		db.Comment.ID.Equals(id),
+	).Delete().Exec(context.Background())
+
+	if err != nil {
+		return entities.CreateException(
+			entities.ExceptionCode_NotHandledError,
+			entities.ExceptionMessage_NotHandledError,
+		)
+	}
+
 	return nil
 }
 
-func (*CommentRepository) List(listing entities.Listing) ([]entities.Comment, int64, *entities.Exception) {
-	return nil, 0, nil
+func (r *CommentRepository) List(listing entities.Listing) ([]entities.Comment, int, *entities.Exception) {
+	results, err := r.prisma.Comment.FindMany().Skip(
+		listing.Page * listing.Pagesize,
+	).Take(listing.Pagesize).Exec(context.Background())
+
+	if err != nil {
+		return nil, 0, entities.CreateException(
+			entities.ExceptionCode_NotHandledError,
+			entities.ExceptionMessage_NotHandledError,
+		)
+	}
+
+	countResult, err := r.prisma.Prisma.ExecuteRaw(
+		`SELECT COUNT(*) FROM "Comment"`,
+	).Exec(context.Background())
+
+	if err != nil {
+		return nil, 0, entities.CreateException(
+			entities.ExceptionCode_NotHandledError,
+			entities.ExceptionMessage_NotHandledError,
+		)
+	}
+
+	var comments []entities.Comment
+
+	for _, result := range results {
+		comments = append(comments, entities.Comment{
+			ID:              result.ID,
+			Content:         result.Content,
+			AccommodationID: result.AccommodationID,
+			UserID:          result.UserID,
+		})
+	}
+
+	return comments, countResult.Count, nil
 }
 
-func (*CommentRepository) FindOne(id string) (entities.Comment, *entities.Exception) {
-	return entities.Comment{}, nil
+func (r *CommentRepository) FindOne(id string) (entities.Comment, *entities.Exception) {
+	result, err := r.prisma.Comment.FindUnique(
+		db.Comment.ID.Equals(id),
+	).Exec(context.Background())
+
+	if err != nil {
+		return entities.Comment{}, entities.CreateException(
+			entities.ExceptionCode_BadInputFormat,
+			entities.ExceptionMessage_BadInputFormat,
+		)
+	}
+
+	if result == nil {
+		return entities.Comment{}, entities.CreateException(
+			entities.ExceptionCode_RessourceNotFound,
+			entities.ExceptionMessage_RessourceNotFound,
+		)
+	}
+
+	return entities.Comment{
+		ID:              result.ID,
+		Content:         result.Content,
+		AccommodationID: result.AccommodationID,
+		UserID:          result.UserID,
+	}, nil
 }

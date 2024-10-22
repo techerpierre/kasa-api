@@ -27,7 +27,7 @@ func (a *AuthorizationAPI) Delete(id string) *entities.Exception {
 	return a.service.Delete(id)
 }
 
-func (a *AuthorizationAPI) List() ([]entities.Authorizations, int64, *entities.Exception) {
+func (a *AuthorizationAPI) List() ([]entities.Authorizations, int, *entities.Exception) {
 	return a.service.List()
 }
 

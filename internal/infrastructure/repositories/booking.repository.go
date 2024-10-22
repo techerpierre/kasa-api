@@ -27,7 +27,7 @@ func (*BookingRepository) Delete(id string) *entities.Exception {
 	return nil
 }
 
-func (*BookingRepository) List(listing entities.Listing) ([]entities.Booking, int64, *entities.Exception) {
+func (*BookingRepository) List(listing entities.Listing) ([]entities.Booking, int, *entities.Exception) {
 	return nil, 0, nil
 }
 
