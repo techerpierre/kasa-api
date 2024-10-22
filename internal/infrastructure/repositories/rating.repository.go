@@ -57,6 +57,13 @@ func (r *RatingRepository) Update(id string, data entities.Rating) (entities.Rat
 	).Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.Rating{}, entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
+
 		return entities.Rating{}, entities.CreateException(
 			entities.ExceptionCode_BadInputFormat,
 			entities.ExceptionMessage_BadInputFormat,
@@ -77,6 +84,13 @@ func (r *RatingRepository) Delete(id string) *entities.Exception {
 	).Delete().Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
+
 		return entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,

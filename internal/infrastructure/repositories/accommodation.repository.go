@@ -84,6 +84,13 @@ func (r *AccommodationRepository) Update(id string, data entities.Accommodation)
 	).Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.Accommodation{}, entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
+
 		return entities.Accommodation{}, entities.CreateException(
 			entities.ExceptionCode_BadInputFormat,
 			entities.ExceptionMessage_BadInputFormat,
@@ -114,6 +121,12 @@ func (r *AccommodationRepository) Delete(id string) *entities.Exception {
 	).Delete().Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
 		return entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,

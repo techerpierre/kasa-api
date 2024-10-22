@@ -41,6 +41,13 @@ func (r *AuthorizationsRepository) Update(id string, data entities.Authorization
 	).Update().Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.Authorizations{}, entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
+
 		return entities.Authorizations{}, entities.CreateException(
 			entities.ExceptionCode_BadInputFormat,
 			entities.ExceptionMessage_BadInputFormat,
@@ -58,6 +65,13 @@ func (r *AuthorizationsRepository) Delete(id string) *entities.Exception {
 	).Delete().Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
+
 		return entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,
