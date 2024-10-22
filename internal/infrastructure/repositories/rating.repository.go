@@ -113,7 +113,7 @@ func (r *RatingRepository) List(listing entities.Listing) ([]entities.Rating, in
 	}
 
 	countResult, err := r.prisma.Prisma.ExecuteRaw(
-		`SELECT COUNT(*) FROM Rating`,
+		`SELECT COUNT(*) FROM "Rating"`,
 	).Exec(context.Background())
 
 	if err != nil {
