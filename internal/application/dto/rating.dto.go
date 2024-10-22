@@ -21,3 +21,9 @@ func PipeRatingInDTO(source *entities.Rating, target *RatingDTO) {
 	target.AccommodationID = source.AccommodationID
 	target.UserID = source.UserID
 }
+
+func PipeInputDTOInRating(source *RatingInputDTO, target *entities.Rating) {
+	target.Value = source.Value
+	target.AccommodationID = source.AccommodationID
+	target.UserID = source.UserID
+}

@@ -31,3 +31,13 @@ func PipeUserInDTO(source *entities.User, target *UserDTO) {
 	target.Cover = source.Cover
 	target.AuthorizationsID = source.AuthorizationsID
 }
+
+func PipeInputDTOInUser(source *UserInputDTO, target *entities.User) {
+	target.Email = source.Email
+	target.Password = source.Password
+	target.Firstname = source.Firstname
+	target.Lastname = source.Lastname
+	target.Picture = source.Picture
+	target.Cover = source.Cover
+	target.AuthorizationsID = source.AuthorizationsID
+}
