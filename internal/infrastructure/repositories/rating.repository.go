@@ -129,16 +129,16 @@ func (r *RatingRepository) FindOne(id string) (entities.Rating, *entities.Except
 	).Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.Rating{}, entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
+
 		return entities.Rating{}, entities.CreateException(
 			entities.ExceptionCode_BadInputFormat,
 			entities.ExceptionMessage_BadInputFormat,
-		)
-	}
-
-	if result == nil {
-		return entities.Rating{}, entities.CreateException(
-			entities.ExceptionCode_RessourceNotFound,
-			entities.ExceptionMessage_RessourceNotFound,
 		)
 	}
 

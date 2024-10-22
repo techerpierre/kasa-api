@@ -176,16 +176,16 @@ func (r *AccommodationRepository) FindOne(id string) (entities.Accommodation, *e
 	).Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.Accommodation{}, entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
+
 		return entities.Accommodation{}, entities.CreateException(
 			entities.ExceptionCode_BadInputFormat,
 			entities.ExceptionMessage_BadInputFormat,
-		)
-	}
-
-	if result == nil {
-		return entities.Accommodation{}, entities.CreateException(
-			entities.ExceptionCode_RessourceNotFound,
-			entities.ExceptionMessage_RessourceNotFound,
 		)
 	}
 

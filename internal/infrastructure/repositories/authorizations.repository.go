@@ -105,16 +105,16 @@ func (r *AuthorizationsRepository) FindOne(id string) (entities.Authorizations, 
 	).Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.Authorizations{}, entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
+
 		return entities.Authorizations{}, entities.CreateException(
 			entities.ExceptionCode_BadInputFormat,
 			entities.ExceptionMessage_BadInputFormat,
-		)
-	}
-
-	if result == nil {
-		return entities.Authorizations{}, entities.CreateException(
-			entities.ExceptionCode_RessourceNotFound,
-			entities.ExceptionMessage_RessourceNotFound,
 		)
 	}
 

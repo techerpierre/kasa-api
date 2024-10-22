@@ -135,16 +135,16 @@ func (r *BookingRepository) FindOne(id string) (entities.Booking, *entities.Exce
 	).Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.Booking{}, entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
+
 		return entities.Booking{}, entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,
-		)
-	}
-
-	if result == nil {
-		return entities.Booking{}, entities.CreateException(
-			entities.ExceptionCode_RessourceNotFound,
-			entities.ExceptionMessage_RessourceNotFound,
 		)
 	}
 

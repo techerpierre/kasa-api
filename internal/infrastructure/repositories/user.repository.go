@@ -146,16 +146,16 @@ func (r *UserRepository) FindOne(id string) (entities.User, *entities.Exception)
 	).Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.User{}, entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
+
 		return entities.User{}, entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,
-		)
-	}
-
-	if result == nil {
-		return entities.User{}, entities.CreateException(
-			entities.ExceptionCode_RessourceNotFound,
-			entities.ExceptionMessage_RessourceNotFound,
 		)
 	}
 
@@ -177,16 +177,16 @@ func (r *UserRepository) FindOneByEmail(email string) (entities.User, *entities.
 	).Exec(context.Background())
 
 	if err != nil {
+		if err == db.ErrNotFound {
+			return entities.User{}, entities.CreateException(
+				entities.ExceptionCode_RessourceNotFound,
+				entities.ExceptionMessage_RessourceNotFound,
+			)
+		}
+
 		return entities.User{}, entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,
-		)
-	}
-
-	if result == nil {
-		return entities.User{}, entities.CreateException(
-			entities.ExceptionCode_RessourceNotFound,
-			entities.ExceptionMessage_RessourceNotFound,
 		)
 	}
 
