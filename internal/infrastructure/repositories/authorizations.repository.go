@@ -20,11 +20,13 @@ func CreateAuthorizationsRepository(prisma *db.PrismaClient) *AuthorizationsRepo
 }
 
 func (r *AuthorizationsRepository) Create(data entities.Authorizations) (entities.Authorizations, *entities.Exception) {
+
 	result, err := r.prisma.Authorizations.CreateOne(
-		db.Authorizations.ID.EqualsIfPresent(helpers.NilIfEmptyString(data.ID)),
+		db.Authorizations.ID.SetIfPresent(helpers.NilIfEmptyString(data.ID)),
 	).Exec(context.Background())
 
 	if err != nil {
+		fmt.Printf("Input error: %s\n", err.Error())
 		return entities.Authorizations{}, entities.CreateException(
 			entities.ExceptionCode_BadInputFormat,
 			entities.ExceptionMessage_BadInputFormat,
@@ -86,7 +88,6 @@ func (r *AuthorizationsRepository) List() ([]entities.Authorizations, int, *enti
 	results, err := r.prisma.Authorizations.FindMany().Exec(context.Background())
 
 	if err != nil {
-		fmt.Printf("listing error: %s\n", err.Error())
 		return nil, 0, entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,
@@ -98,7 +99,6 @@ func (r *AuthorizationsRepository) List() ([]entities.Authorizations, int, *enti
 	).Exec(context.Background())
 
 	if err != nil {
-		fmt.Printf("Count error: %s\n", err.Error())
 		return nil, 0, entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,

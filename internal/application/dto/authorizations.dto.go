@@ -6,10 +6,14 @@ type AuthorizationsDTO struct {
 	ID string `json:"id"`
 }
 
-type AuthorizationsInputDTO struct{}
+type AuthorizationsInputDTO struct {
+	ID string `json:"id"`
+}
 
 func PipeAuthorizationsInDTO(source *entities.Authorizations, target *AuthorizationsDTO) {
 	target.ID = source.ID
 }
 
-func PipeInputDTOInAuthorizations(source *AuthorizationsInputDTO, target *entities.Authorizations) {}
+func PipeInputDTOInAuthorizations(source *AuthorizationsInputDTO, target *entities.Authorizations) {
+	target.ID = source.ID
+}
