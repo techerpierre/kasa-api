@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/techerpierre/kasa-api/internal/domain/entities"
 	"github.com/techerpierre/kasa-api/internal/helpers"
@@ -113,9 +114,11 @@ func (r *CommentRepository) List(listing entities.Listing) ([]entities.Comment, 
 		)
 	}
 
-	countResult, err := r.prisma.Prisma.ExecuteRaw(
-		`SELECT COUNT(*) FROM "Comment"`,
-	).Exec(context.Background())
+	var countResult CountResult
+
+	err = r.prisma.Prisma.QueryRaw(
+		`SELECT COUNT(*) as count FROM "Comment"`,
+	).Exec(context.Background(), &countResult)
 
 	if err != nil {
 		return nil, 0, entities.CreateException(
@@ -123,6 +126,8 @@ func (r *CommentRepository) List(listing entities.Listing) ([]entities.Comment, 
 			entities.ExceptionMessage_NotHandledError,
 		)
 	}
+
+	count, _ := strconv.Atoi(countResult.Count)
 
 	var comments []entities.Comment
 
@@ -135,7 +140,7 @@ func (r *CommentRepository) List(listing entities.Listing) ([]entities.Comment, 
 		})
 	}
 
-	return comments, countResult.Count, nil
+	return comments, count, nil
 }
 
 func (r *CommentRepository) FindOne(id string) (entities.Comment, *entities.Exception) {

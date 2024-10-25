@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/techerpierre/kasa-api/internal/domain/entities"
 	"github.com/techerpierre/kasa-api/internal/helpers"
@@ -26,7 +25,6 @@ func (r *AuthorizationsRepository) Create(data entities.Authorizations) (entitie
 	).Exec(context.Background())
 
 	if err != nil {
-		fmt.Printf("Input error: %s\n", err.Error())
 		return entities.Authorizations{}, entities.CreateException(
 			entities.ExceptionCode_BadInputFormat,
 			entities.ExceptionMessage_BadInputFormat,

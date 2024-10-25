@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/techerpierre/kasa-api/internal/domain/entities"
 	"github.com/techerpierre/kasa-api/internal/helpers"
@@ -117,9 +118,11 @@ func (r *BookingRepository) List(listing entities.Listing) ([]entities.Booking, 
 		)
 	}
 
-	countResult, err := r.prisma.Prisma.ExecuteRaw(
+	var countResult CountResult
+
+	err = r.prisma.Prisma.QueryRaw(
 		`SELECT COUNT(*) FROM "Booking"`,
-	).Exec(context.Background())
+	).Exec(context.Background(), &countResult)
 
 	if err != nil {
 		return nil, 0, entities.CreateException(
@@ -127,6 +130,8 @@ func (r *BookingRepository) List(listing entities.Listing) ([]entities.Booking, 
 			entities.ExceptionMessage_NotHandledError,
 		)
 	}
+
+	count, _ := strconv.Atoi(countResult.Count)
 
 	var bookings []entities.Booking
 
@@ -140,7 +145,7 @@ func (r *BookingRepository) List(listing entities.Listing) ([]entities.Booking, 
 		})
 	}
 
-	return bookings, countResult.Count, nil
+	return bookings, count, nil
 }
 
 func (r *BookingRepository) FindOne(id string) (entities.Booking, *entities.Exception) {
