@@ -114,7 +114,7 @@ func (r *CommentRepository) List(listing entities.Listing) ([]entities.Comment, 
 		)
 	}
 
-	var countResult CountResult
+	var countResult []CountResult
 
 	err = r.prisma.Prisma.QueryRaw(
 		`SELECT COUNT(*) as count FROM "Comment"`,
@@ -127,7 +127,7 @@ func (r *CommentRepository) List(listing entities.Listing) ([]entities.Comment, 
 		)
 	}
 
-	count, _ := strconv.Atoi(countResult.Count)
+	count, _ := strconv.Atoi(countResult[0].Count)
 
 	var comments []entities.Comment
 

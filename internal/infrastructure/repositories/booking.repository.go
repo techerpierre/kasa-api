@@ -118,7 +118,7 @@ func (r *BookingRepository) List(listing entities.Listing) ([]entities.Booking, 
 		)
 	}
 
-	var countResult CountResult
+	var countResult []CountResult
 
 	err = r.prisma.Prisma.QueryRaw(
 		`SELECT COUNT(*) FROM "Booking"`,
@@ -131,7 +131,7 @@ func (r *BookingRepository) List(listing entities.Listing) ([]entities.Booking, 
 		)
 	}
 
-	count, _ := strconv.Atoi(countResult.Count)
+	count, _ := strconv.Atoi(countResult[0].Count)
 
 	var bookings []entities.Booking
 

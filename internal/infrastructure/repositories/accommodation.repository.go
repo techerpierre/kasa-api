@@ -149,7 +149,7 @@ func (r *AccommodationRepository) List(listing entities.Listing) ([]entities.Acc
 		)
 	}
 
-	var countResult CountResult
+	var countResult []CountResult
 
 	err = r.prisma.Prisma.QueryRaw(
 		`SELECT COUNT(*) as count FROM "Accommodation"`,
@@ -162,7 +162,7 @@ func (r *AccommodationRepository) List(listing entities.Listing) ([]entities.Acc
 		)
 	}
 
-	count, _ := strconv.Atoi(countResult.Count)
+	count, _ := strconv.Atoi(countResult[0].Count)
 
 	var accommodations []entities.Accommodation
 
