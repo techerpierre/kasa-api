@@ -2,8 +2,11 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/techerpierre/kasa-api/internal/application/dto"
+	"github.com/techerpierre/kasa-api/internal/domain/entities"
 	"github.com/techerpierre/kasa-api/internal/domain/ports"
 )
 
@@ -27,22 +30,143 @@ func (h *BookingHTTPHandler) RegisterRoutes() {
 	h.app.GET("/bookings/:id", h.FindOne)
 }
 
-func (*BookingHTTPHandler) Create(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Create new booking."})
+func (h *BookingHTTPHandler) Create(c *gin.Context) {
+	var body dto.BookingInputDTO
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": "Cannot parse body."}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	var bookingData entities.Booking
+	dto.PipeInputDTOInBooking(&body, &bookingData)
+
+	booking, exception := h.api.Create(bookingData)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData dto.BookingDTO
+	dto.PipeBookingInDTO(&booking, &responseData)
+
+	response := dto.CreateResponse(http.StatusOK, responseData, nil)
+
+	c.JSON(response.StatusCode, response)
 }
 
-func (*BookingHTTPHandler) Update(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Update a booking."})
+func (h *BookingHTTPHandler) Update(c *gin.Context) {
+	id := c.Param("id")
+
+	var body dto.BookingInputDTO
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": "Cannot parse body."}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	var bookingData entities.Booking
+	dto.PipeInputDTOInBooking(&body, &bookingData)
+
+	booking, exception := h.api.Update(id, bookingData)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData dto.BookingDTO
+	dto.PipeBookingInDTO(&booking, &responseData)
+
+	response := dto.CreateResponse(http.StatusOK, responseData, nil)
+
+	c.JSON(response.StatusCode, response)
 }
 
-func (*BookingHTTPHandler) Delete(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Delete a booking."})
+func (h *BookingHTTPHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+
+	exception := h.api.Delete(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	response := dto.CreateResponse(http.StatusOK, gin.H{"message": "Booking deletion success."}, nil)
+
+	c.JSON(response.StatusCode, response)
 }
 
-func (*BookingHTTPHandler) List(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "List bookings."})
+func (h *BookingHTTPHandler) List(c *gin.Context) {
+	page, err := strconv.Atoi(c.DefaultQuery("page", "0"))
+
+	if err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": `The "page" query must be an integer.`}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	pagesize, err := strconv.Atoi(c.DefaultQuery("pagesize", "10"))
+
+	if err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": `The "pagesize" query must be an integer.`}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	listing := entities.Listing{
+		Page:     page,
+		Pagesize: pagesize,
+	}
+
+	bookings, count, exception := h.api.List(listing)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData []dto.BookingDTO
+
+	for _, booking := range bookings {
+		var result dto.BookingDTO
+		dto.PipeBookingInDTO(&booking, &result)
+		responseData = append(responseData, result)
+	}
+
+	response := dto.CreateResponse(http.StatusOK, responseData, &count)
+
+	c.JSON(response.StatusCode, response)
 }
 
-func (*BookingHTTPHandler) FindOne(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Find a booking."})
+func (h *BookingHTTPHandler) FindOne(c *gin.Context) {
+	id := c.Param("id")
+
+	booking, exception := h.api.FindOne(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData dto.BookingDTO
+	dto.PipeBookingInDTO(&booking, &responseData)
+
+	response := dto.CreateResponse(http.StatusOK, responseData, nil)
+
+	c.JSON(response.StatusCode, response)
 }
