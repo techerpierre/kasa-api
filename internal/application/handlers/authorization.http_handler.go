@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/techerpierre/kasa-api/internal/application/dto"
+	"github.com/techerpierre/kasa-api/internal/domain/entities"
 	"github.com/techerpierre/kasa-api/internal/domain/ports"
 )
 
@@ -27,22 +29,122 @@ func (h *AuthorizationHTTPHandler) RegisterRoutes() {
 	h.app.GET("/authorizations/:id", h.FindOne)
 }
 
-func (*AuthorizationHTTPHandler) Create(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Create new authorization."})
+func (h *AuthorizationHTTPHandler) Create(c *gin.Context) {
+	var body dto.AuthorizationsInputDTO
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": "Cannot parse body."}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	var authorizationData entities.Authorizations
+	dto.PipeInputDTOInAuthorizations(&body, &authorizationData)
+
+	authorization, exception := h.api.Create(authorizationData)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData dto.AuthorizationsDTO
+	dto.PipeAuthorizationsInDTO(&authorization, &responseData)
+
+	response := dto.CreateResponse(http.StatusOK, responseData, nil)
+
+	c.JSON(response.StatusCode, response)
 }
 
-func (*AuthorizationHTTPHandler) Update(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Update a authorization."})
+func (h *AuthorizationHTTPHandler) Update(c *gin.Context) {
+	id := c.Param("id")
+
+	var body dto.AuthorizationsInputDTO
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": "Cannot parse body."}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	var authorizationData entities.Authorizations
+	dto.PipeInputDTOInAuthorizations(&body, &authorizationData)
+
+	authorization, exception := h.api.Update(id, authorizationData)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData dto.AuthorizationsDTO
+	dto.PipeAuthorizationsInDTO(&authorization, &responseData)
+
+	response := dto.CreateResponse(http.StatusOK, responseData, nil)
+
+	c.JSON(response.StatusCode, response)
 }
 
-func (*AuthorizationHTTPHandler) Delete(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Delete a authorization."})
+func (h *AuthorizationHTTPHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+
+	exception := h.api.Delete(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	response := dto.CreateResponse(http.StatusOK, gin.H{"error": "Cannot parse body."}, nil)
+
+	c.JSON(response.StatusCode, response)
 }
 
-func (*AuthorizationHTTPHandler) List(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "List authorizations."})
+func (h *AuthorizationHTTPHandler) List(c *gin.Context) {
+	authorizations, count, exception := h.api.List()
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData []dto.AuthorizationsDTO
+
+	for _, authorization := range authorizations {
+		var result dto.AuthorizationsDTO
+		dto.PipeAuthorizationsInDTO(&authorization, &result)
+		responseData = append(responseData, result)
+	}
+
+	response := dto.CreateResponse(http.StatusOK, responseData, &count)
+
+	c.JSON(response.StatusCode, responseData)
 }
 
-func (*AuthorizationHTTPHandler) FindOne(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Find a authorization."})
+func (h *AuthorizationHTTPHandler) FindOne(c *gin.Context) {
+	id := c.Param("id")
+
+	authorizations, exception := h.api.FindOne(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData dto.AuthorizationsDTO
+	dto.PipeAuthorizationsInDTO(&authorizations, &responseData)
+
+	response := dto.CreateResponse(http.StatusOK, responseData, nil)
+
+	c.JSON(response.StatusCode, response)
 }
