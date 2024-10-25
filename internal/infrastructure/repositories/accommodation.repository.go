@@ -152,7 +152,7 @@ func (r *AccommodationRepository) List(listing entities.Listing) ([]entities.Acc
 	var countResult []CountResult
 
 	err = r.prisma.Prisma.QueryRaw(
-		`SELECT COUNT(*) as count FROM "Accommodation"`,
+		`SELECT COUNT(*) FROM "Accommodation"`,
 	).Exec(context.Background(), &countResult)
 
 	if err != nil {

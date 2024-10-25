@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/techerpierre/kasa-api/internal/domain/entities"
@@ -117,11 +116,10 @@ func (r *RatingRepository) List(listing entities.Listing) ([]entities.Rating, in
 	var countResult []CountResult
 
 	err = r.prisma.Prisma.QueryRaw(
-		`SELECT COUNT(*) as count FROM "Rating"`,
+		`SELECT COUNT(*) FROM "Rating"`,
 	).Exec(context.Background(), &countResult)
 
 	if err != nil {
-		fmt.Printf("dzeffezzfzef: %s", err.Error())
 		return nil, 0, entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,

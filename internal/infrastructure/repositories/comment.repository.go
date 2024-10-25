@@ -117,7 +117,7 @@ func (r *CommentRepository) List(listing entities.Listing) ([]entities.Comment, 
 	var countResult []CountResult
 
 	err = r.prisma.Prisma.QueryRaw(
-		`SELECT COUNT(*) as count FROM "Comment"`,
+		`SELECT COUNT(*) FROM "Comment"`,
 	).Exec(context.Background(), &countResult)
 
 	if err != nil {
