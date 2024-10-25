@@ -101,7 +101,7 @@ func (h *AuthorizationHTTPHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	response := dto.CreateResponse(http.StatusOK, gin.H{"error": "Cannot parse body."}, nil)
+	response := dto.CreateResponse(http.StatusOK, gin.H{"error": "Authorizations deletion success."}, nil)
 
 	c.JSON(response.StatusCode, response)
 }

@@ -2,8 +2,11 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/techerpierre/kasa-api/internal/application/dto"
+	"github.com/techerpierre/kasa-api/internal/domain/entities"
 	"github.com/techerpierre/kasa-api/internal/domain/ports"
 )
 
@@ -27,22 +30,142 @@ func (h *AccomodationHTTPHandler) RegisterRoutes() {
 	h.app.GET("/accommodations/:id", h.FindOne)
 }
 
-func (*AccomodationHTTPHandler) Create(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Create new accommodation."})
+func (h *AccomodationHTTPHandler) Create(c *gin.Context) {
+	var body dto.AccommodationInputDTO
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": "Cannot parse body."}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	var accommodationData entities.Accommodation
+	dto.PipeInputDTOInAccommodation(&body, &accommodationData)
+
+	accommodation, exception := h.api.Create(accommodationData)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData dto.AccommodationDTO
+	dto.PipeAccommodationInDTO(&accommodation, &responseData)
+
+	response := dto.CreateResponse(http.StatusOK, responseData, nil)
+
+	c.JSON(response.StatusCode, response)
 }
 
-func (*AccomodationHTTPHandler) Update(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Update a accommodation."})
+func (h *AccomodationHTTPHandler) Update(c *gin.Context) {
+	id := c.Param("id")
+	var body dto.AccommodationInputDTO
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": "Cannot parse body."}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	var accommodationData entities.Accommodation
+	dto.PipeInputDTOInAccommodation(&body, &accommodationData)
+
+	accommodation, exception := h.api.Update(id, accommodationData)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData dto.AccommodationDTO
+	dto.PipeAccommodationInDTO(&accommodation, &responseData)
+
+	response := dto.CreateResponse(http.StatusOK, responseData, nil)
+
+	c.JSON(response.StatusCode, response)
 }
 
-func (*AccomodationHTTPHandler) Delete(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Delete a accommodation."})
+func (h *AccomodationHTTPHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+
+	exception := h.api.Delete(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	response := dto.CreateResponse(http.StatusOK, gin.H{"message": "Accommodation deletion success."}, nil)
+
+	c.JSON(response.StatusCode, response)
 }
 
-func (*AccomodationHTTPHandler) List(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "List accommodations."})
+func (h *AccomodationHTTPHandler) List(c *gin.Context) {
+	page, err := strconv.Atoi(c.DefaultQuery("page", "0"))
+
+	if err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": `The "page" query must be an integer.`}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	pagesize, err := strconv.Atoi(c.DefaultQuery("pagesize", "10"))
+
+	if err != nil {
+		response := dto.CreateResponse(http.StatusBadRequest, gin.H{"error": `The "pagesize" query must be an integer.`}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	listing := entities.Listing{
+		Page:     page,
+		Pagesize: pagesize,
+	}
+
+	accommodations, count, exception := h.api.List(listing)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData []dto.AccommodationDTO
+
+	for _, accommodation := range accommodations {
+		var result dto.AccommodationDTO
+		dto.PipeAccommodationInDTO(&accommodation, &result)
+		responseData = append(responseData, result)
+	}
+
+	response := dto.CreateResponse(http.StatusOK, responseData, &count)
+
+	c.JSON(response.StatusCode, response)
 }
 
-func (*AccomodationHTTPHandler) FindOne(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Find a accommodation."})
+func (h *AccomodationHTTPHandler) FindOne(c *gin.Context) {
+	id := c.Param("id")
+
+	accommodation, exception := h.api.FindOne(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData dto.AccommodationDTO
+	dto.PipeAccommodationInDTO(&accommodation, &responseData)
+
+	response := dto.CreateResponse(http.StatusOK, responseData, nil)
+
+	c.JSON(response.StatusCode, response)
 }
