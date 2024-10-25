@@ -126,7 +126,7 @@ func (h *AuthorizationHTTPHandler) List(c *gin.Context) {
 
 	response := dto.CreateResponse(http.StatusOK, responseData, &count)
 
-	c.JSON(response.StatusCode, responseData)
+	c.JSON(response.StatusCode, response)
 }
 
 func (h *AuthorizationHTTPHandler) FindOne(c *gin.Context) {

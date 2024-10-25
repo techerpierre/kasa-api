@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/techerpierre/kasa-api/internal/domain/entities"
 	"github.com/techerpierre/kasa-api/internal/helpers"
@@ -85,6 +86,7 @@ func (r *AuthorizationsRepository) List() ([]entities.Authorizations, int, *enti
 	results, err := r.prisma.Authorizations.FindMany().Exec(context.Background())
 
 	if err != nil {
+		fmt.Printf("listing error: %s\n", err.Error())
 		return nil, 0, entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,
@@ -92,10 +94,11 @@ func (r *AuthorizationsRepository) List() ([]entities.Authorizations, int, *enti
 	}
 
 	countResult, err := r.prisma.Prisma.ExecuteRaw(
-		`SELECT COUNT(*) FROM Authorizations`,
+		`SELECT COUNT(*) FROM "Authorizations"`,
 	).Exec(context.Background())
 
 	if err != nil {
+		fmt.Printf("Count error: %s\n", err.Error())
 		return nil, 0, entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,
