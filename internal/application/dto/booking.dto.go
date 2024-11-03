@@ -21,6 +21,13 @@ type BookingInputDTO struct {
 	ClientID        string    `json:"clientId"`
 }
 
+type BookingFiltersDTO struct {
+	Start           *string `form:"start"`
+	End             *string `form:"end"`
+	AccommodationID *string `form:"accommodationId"`
+	ClientID        *string `form:"clientId"`
+}
+
 func PipeBookingInDTO(source *entities.Booking, target *BookingDTO) {
 	target.ID = source.ID
 	target.Start = source.Start
@@ -34,4 +41,13 @@ func PipeInputDTOInBooking(source *BookingInputDTO, target *entities.Booking) {
 	target.End = source.End
 	target.AccommodationID = source.AccommodationID
 	target.ClientID = source.ClientID
+}
+
+func MakeBookingFilters(filterDTO BookingFiltersDTO) []entities.Filter {
+	return []entities.Filter{
+		{Field: "start", Value: filterDTO.Start},
+		{Field: "end", Value: filterDTO.End},
+		{Field: "accommodationId", Value: filterDTO.AccommodationID},
+		{Field: "clientId", Value: filterDTO.ClientID},
+	}
 }

@@ -115,7 +115,17 @@ func (r *UserRepository) Delete(id string) *entities.Exception {
 }
 
 func (r *UserRepository) List(listing entities.Listing) ([]entities.User, int, *entities.Exception) {
-	results, err := r.prisma.User.FindMany().Skip(
+	var filters []db.UserWhereParam
+
+	for _, filter := range listing.Filters {
+		filterQuery, exception := r.getFilterQuery(filter)
+		if exception != nil {
+			return nil, 0, exception
+		}
+		filters = append(filters, filterQuery)
+	}
+
+	results, err := r.prisma.User.FindMany(filters...).Skip(
 		listing.Page * listing.Pagesize,
 	).Take(listing.Pagesize).Exec(context.Background())
 
@@ -219,4 +229,22 @@ func (r *UserRepository) FindOneByEmail(email string) (entities.User, *entities.
 		Cover:            helpers.PointerFromPrismaField(result.Cover()),
 		AuthorizationsID: result.AuthorizationsID,
 	}, nil
+}
+
+func (*UserRepository) getFilterQuery(filter entities.Filter) (db.UserWhereParam, *entities.Exception) {
+	queries := map[string]db.UserWhereParam{
+		"email":            db.User.Email.ContainsIfPresent(filter.Value),
+		"firstname":        db.User.Firstname.ContainsIfPresent(filter.Value),
+		"lastname":         db.User.Lastname.ContainsIfPresent(filter.Value),
+		"authorizationsId": db.User.AuthorizationsID.ContainsIfPresent(filter.Value),
+	}
+
+	if query, found := queries[filter.Field]; found {
+		return query, nil
+	}
+
+	return db.User.ID.Contains(""), entities.CreateException(
+		entities.ExceptionCode_BadInputFormat,
+		entities.ExceptionMessage_BadInputFormat,
+	)
 }

@@ -124,9 +124,18 @@ func (h *BookingHTTPHandler) List(c *gin.Context) {
 		return
 	}
 
+	var filters dto.BookingFiltersDTO
+
+	if err := c.ShouldBindQuery(&filters); err != nil {
+		response := dto.CreateResponse(http.StatusInternalServerError, gin.H{"error": "Cannot parse queries"}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
 	listing := entities.Listing{
 		Page:     page,
 		Pagesize: pagesize,
+		Filters:  dto.MakeBookingFilters(filters),
 	}
 
 	bookings, count, exception := h.api.List(listing)

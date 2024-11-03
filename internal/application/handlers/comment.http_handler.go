@@ -124,9 +124,18 @@ func (h *CommentHTTPHandler) List(c *gin.Context) {
 		return
 	}
 
+	var filters dto.CommentFiltersDTO
+
+	if err := c.ShouldBindQuery(&filters); err != nil {
+		response := dto.CreateResponse(http.StatusInternalServerError, gin.H{"error": "Cannot parse queries"}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
 	listing := entities.Listing{
 		Page:     page,
 		Pagesize: pagesize,
+		Filters:  dto.MakeCommentFilters(filters),
 	}
 
 	comments, count, exception := h.api.List(listing)

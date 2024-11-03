@@ -138,7 +138,17 @@ func (r *AccommodationRepository) Delete(id string) *entities.Exception {
 }
 
 func (r *AccommodationRepository) List(listing entities.Listing) ([]entities.Accommodation, int, *entities.Exception) {
-	results, err := r.prisma.Accommodation.FindMany().Skip(
+	var filters []db.AccommodationWhereParam
+
+	for _, filter := range listing.Filters {
+		filterQuery, exception := r.getFilterQuery(filter)
+		if exception != nil {
+			return nil, 0, exception
+		}
+		filters = append(filters, filterQuery)
+	}
+
+	results, err := r.prisma.Accommodation.FindMany(filters...).Skip(
 		listing.Page * listing.Pagesize,
 	).Take(listing.Pagesize).Exec(context.Background())
 
@@ -223,4 +233,26 @@ func (r *AccommodationRepository) FindOne(id string) (entities.Accommodation, *e
 		Tags:             result.Tags,
 		UserID:           result.UserID,
 	}, nil
+}
+
+func (*AccommodationRepository) getFilterQuery(filter entities.Filter) (db.AccommodationWhereParam, *entities.Exception) {
+	queries := map[string]db.AccommodationWhereParam{
+		"title":            db.Accommodation.Title.ContainsIfPresent(filter.Value),
+		"description":      db.Accommodation.Description.ContainsIfPresent(filter.Value),
+		"adress":           db.Accommodation.Adress.ContainsIfPresent(filter.Value),
+		"additionalAdress": db.Accommodation.AdditionalAdress.ContainsIfPresent(filter.Value),
+		"zip":              db.Accommodation.Zip.ContainsIfPresent(filter.Value),
+		"city":             db.Accommodation.City.ContainsIfPresent(filter.Value),
+		"country":          db.Accommodation.Country.ContainsIfPresent(filter.Value),
+		"userId":           db.Accommodation.UserID.ContainsIfPresent(filter.Value),
+	}
+
+	if query, found := queries[filter.Field]; found {
+		return query, nil
+	}
+
+	return db.Accommodation.ID.Contains(""), entities.CreateException(
+		entities.ExceptionCode_BadInputFormat,
+		entities.ExceptionMessage_BadInputFormat,
+	)
 }

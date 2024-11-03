@@ -103,7 +103,17 @@ func (r *CommentRepository) Delete(id string) *entities.Exception {
 }
 
 func (r *CommentRepository) List(listing entities.Listing) ([]entities.Comment, int, *entities.Exception) {
-	results, err := r.prisma.Comment.FindMany().Skip(
+	var filters []db.CommentWhereParam
+
+	for _, filter := range listing.Filters {
+		filterQuery, exception := r.getFilterQuery(filter)
+		if exception != nil {
+			return nil, 0, exception
+		}
+		filters = append(filters, filterQuery)
+	}
+
+	results, err := r.prisma.Comment.FindMany(filters...).Skip(
 		listing.Page * listing.Pagesize,
 	).Take(listing.Pagesize).Exec(context.Background())
 
@@ -168,4 +178,21 @@ func (r *CommentRepository) FindOne(id string) (entities.Comment, *entities.Exce
 		AccommodationID: result.AccommodationID,
 		UserID:          result.UserID,
 	}, nil
+}
+
+func (*CommentRepository) getFilterQuery(fiter entities.Filter) (db.CommentWhereParam, *entities.Exception) {
+	queries := map[string]db.CommentWhereParam{
+		"content":         db.Comment.Content.EqualsIfPresent(fiter.Value),
+		"accommodationId": db.Comment.AccommodationID.EqualsIfPresent(fiter.Value),
+		"userId":          db.Comment.UserID.EqualsIfPresent(fiter.Value),
+	}
+
+	if query, found := queries[fiter.Field]; found {
+		return query, nil
+	}
+
+	return db.Comment.ID.Contains(""), entities.CreateException(
+		entities.ExceptionCode_BadInputFormat,
+		entities.ExceptionMessage_BadInputFormat,
+	)
 }

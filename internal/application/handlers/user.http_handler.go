@@ -108,7 +108,6 @@ func (h *UserHTTPHandler) Delete(c *gin.Context) {
 }
 
 func (h *UserHTTPHandler) List(c *gin.Context) {
-
 	page, err := strconv.Atoi(c.DefaultQuery("page", "0"))
 
 	if err != nil {
@@ -125,9 +124,18 @@ func (h *UserHTTPHandler) List(c *gin.Context) {
 		return
 	}
 
+	var filters dto.UserFiltersDTO
+
+	if err := c.ShouldBindQuery(&filters); err != nil {
+		response := dto.CreateResponse(http.StatusInternalServerError, gin.H{"error": "Cannot parse queries"}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
 	listing := entities.Listing{
 		Page:     page,
 		Pagesize: pagesize,
+		Filters:  dto.MakeUserFilters(filters),
 	}
 
 	users, count, exception := h.api.List(listing)

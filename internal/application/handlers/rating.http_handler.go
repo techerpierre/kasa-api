@@ -123,9 +123,18 @@ func (h *RatingHTTPHandler) List(c *gin.Context) {
 		return
 	}
 
+	var filters dto.RatingFiltersDTO
+
+	if err := c.ShouldBindQuery(&filters); err != nil {
+		response := dto.CreateResponse(http.StatusInternalServerError, gin.H{"error": "Cannot parse queries"}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
 	listing := entities.Listing{
 		Page:     page,
 		Pagesize: pagesize,
+		Filters:  dto.MakeRatingFilters(filters),
 	}
 
 	ratings, count, exception := h.api.List(listing)

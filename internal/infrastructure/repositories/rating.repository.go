@@ -102,7 +102,17 @@ func (r *RatingRepository) Delete(id string) *entities.Exception {
 }
 
 func (r *RatingRepository) List(listing entities.Listing) ([]entities.Rating, int, *entities.Exception) {
-	results, err := r.prisma.Rating.FindMany().Skip(
+	var filters []db.RatingWhereParam
+
+	for _, filter := range listing.Filters {
+		filterQuery, exception := r.getFilterQuery(filter)
+		if exception != nil {
+			return nil, 0, exception
+		}
+		filters = append(filters, filterQuery)
+	}
+
+	results, err := r.prisma.Rating.FindMany(filters...).Skip(
 		listing.Page * listing.Pagesize,
 	).Take(listing.Pagesize).Exec(context.Background())
 
@@ -167,4 +177,20 @@ func (r *RatingRepository) FindOne(id string) (entities.Rating, *entities.Except
 		AccommodationID: result.AccommodationID,
 		UserID:          result.UserID,
 	}, nil
+}
+
+func (*RatingRepository) getFilterQuery(filter entities.Filter) (db.RatingWhereParam, *entities.Exception) {
+	queries := map[string]db.RatingWhereParam{
+		"accommodationId": db.Rating.AccommodationID.ContainsIfPresent(filter.Value),
+		"userId":          db.Rating.UserID.ContainsIfPresent(filter.Value),
+	}
+
+	if query, found := queries[filter.Field]; found {
+		return query, nil
+	}
+
+	return db.Rating.ID.Contains(""), entities.CreateException(
+		entities.ExceptionCode_BadInputFormat,
+		entities.ExceptionMessage_BadInputFormat,
+	)
 }

@@ -107,7 +107,17 @@ func (r *BookingRepository) Delete(id string) *entities.Exception {
 }
 
 func (r *BookingRepository) List(listing entities.Listing) ([]entities.Booking, int, *entities.Exception) {
-	results, err := r.prisma.Booking.FindMany().Skip(
+	var filters []db.BookingWhereParam
+
+	for _, filter := range listing.Filters {
+		filterQuery, exception := r.getFilterQuery(filter)
+		if exception != nil {
+			return nil, 0, exception
+		}
+		filters = append(filters, filterQuery)
+	}
+
+	results, err := r.prisma.Booking.FindMany(filters...).Skip(
 		listing.Page * listing.Pagesize,
 	).Take(listing.Pagesize).Exec(context.Background())
 
@@ -174,4 +184,22 @@ func (r *BookingRepository) FindOne(id string) (entities.Booking, *entities.Exce
 		AccommodationID: result.AccommodationID,
 		ClientID:        result.ClientID,
 	}, nil
+}
+
+func (*BookingRepository) getFilterQuery(filter entities.Filter) (db.BookingWhereParam, *entities.Exception) {
+	queries := map[string]db.BookingWhereParam{
+		"start":           db.Booking.Start.EqualsIfPresent(helpers.StringToTime(filter.Value, "0000-00-00 00:00:00")),
+		"end":             db.Booking.End.EqualsIfPresent(helpers.StringToTime(filter.Value, "0000-00-00 00:00:00")),
+		"accommodationId": db.Booking.AccommodationID.ContainsIfPresent(filter.Value),
+		"clientId":        db.Booking.ClientID.ContainsIfPresent(filter.Value),
+	}
+
+	if query, found := queries[filter.Field]; found {
+		return query, nil
+	}
+
+	return db.Booking.ID.Contains(""), entities.CreateException(
+		entities.ExceptionCode_BadInputFormat,
+		entities.ExceptionMessage_BadInputFormat,
+	)
 }

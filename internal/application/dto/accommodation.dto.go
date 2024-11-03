@@ -35,6 +35,17 @@ type AccommodationInputDTO struct {
 	UserID           string   `json:"userId"`
 }
 
+type AccommodationFiltersDTO struct {
+	Title            *string `form:"title"`
+	Description      *string `form:"description"`
+	Adress           *string `form:"adress"`
+	AdditionalAdress *string `form:"additionalAdress"`
+	Zip              *string `form:"zip"`
+	City             *string `form:"city"`
+	Country          *string `form:"country"`
+	UserID           *string `form:"userId"`
+}
+
 func PipeAccommodationInDTO(source *entities.Accommodation, target *AccommodationDTO) {
 	target.ID = source.ID
 	target.Title = source.Title
@@ -66,4 +77,17 @@ func PipeInputDTOInAccommodation(source *AccommodationInputDTO, target *entities
 	target.Equipments = source.Equipments
 	target.Tags = source.Tags
 	target.UserID = source.UserID
+}
+
+func MakeAccommodationFilters(filterDTO AccommodationFiltersDTO) []entities.Filter {
+	return []entities.Filter{
+		{Field: "title", Value: filterDTO.Title},
+		{Field: "description", Value: filterDTO.Description},
+		{Field: "adress", Value: filterDTO.Adress},
+		{Field: "additionalAdress", Value: filterDTO.AdditionalAdress},
+		{Field: "zip", Value: filterDTO.Zip},
+		{Field: "city", Value: filterDTO.City},
+		{Field: "country", Value: filterDTO.Country},
+		{Field: "userId", Value: filterDTO.UserID},
+	}
 }
