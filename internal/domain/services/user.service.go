@@ -28,6 +28,14 @@ func (s *UserService) Create(data entities.User) (entities.User, *entities.Excep
 }
 
 func (s *UserService) Update(id string, data entities.User) (entities.User, *entities.Exception) {
+	if data.Password != "" {
+		hash, exception := s.passwordService.Hash(data.Password)
+		if exception != nil {
+			return entities.User{}, exception
+		}
+		data.Password = hash
+	}
+
 	return s.output.Update(id, data)
 }
 
@@ -41,4 +49,8 @@ func (s *UserService) List(listing entities.Listing) ([]entities.User, int, *ent
 
 func (s *UserService) FindOne(id string) (entities.User, *entities.Exception) {
 	return s.output.FindOne(id)
+}
+
+func (s *UserService) FindOneByEmail(email string) (entities.User, *entities.Exception) {
+	return s.output.FindOneByEmail(email)
 }

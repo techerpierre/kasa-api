@@ -19,6 +19,8 @@ func getHttpCode(exceptionCode entities.ExceptionCode) int {
 		return http.StatusBadRequest
 	case entities.ExceptionCode_NotAllowedScope:
 		return http.StatusMethodNotAllowed
+	case entities.ExceptionCode_Unauthorized:
+		return http.StatusUnauthorized
 	default:
 		return http.StatusInternalServerError
 	}

@@ -16,14 +16,18 @@ func Instanciate(app *gin.Engine, prisma *db.PrismaClient) {
 	bookingRepository := repositories.CreateBookingRepository(prisma)
 	commentRepository := repositories.CreateCommentRepository(prisma)
 	ratingRepository := repositories.CreateRatingRepository(prisma)
+	passwordRepository := repositories.CreatePasswordRepository()
+	jwtRepository := repositories.CreateJwtRepository()
 
-	passwordService := services.NewPasswordService()
+	passwordService := services.CreatePasswordService(passwordRepository)
+	jwtService := services.CreateJwtService(jwtRepository)
 	userService := services.CreateUserService(userRepository, passwordService)
 	accommodationService := services.CreateAccomodationService(accommodationRepository)
 	authorizationService := services.CreateAuthorizationsService(authorizationRepository)
 	bookingService := services.CreateBookingService(bookingRepository)
 	commentService := services.CreateCommentService(commentRepository)
 	ratingService := services.CreateRatingService(ratingRepository)
+	authService := services.CreateAuthService(userService, passwordService, jwtService)
 
 	userAPI := api.CreateUserAPI(userService)
 	accommodationAPI := api.CreateAccommodationAPI(accommodationService)
@@ -31,6 +35,7 @@ func Instanciate(app *gin.Engine, prisma *db.PrismaClient) {
 	bookingAPI := api.CreateBookingAPI(bookingService)
 	commentAPI := api.CreateCommentAPI(commentService)
 	ratingAPI := api.CreateRatingAPI(ratingService)
+	authApi := api.CreateAuthApi(authService)
 
 	handlers.CreateUserHTTPHandler(app, userAPI).RegisterRoutes()
 	handlers.CreateAccomodationHTTPHandler(app, accommodationAPI).RegisterRoutes()
@@ -38,4 +43,5 @@ func Instanciate(app *gin.Engine, prisma *db.PrismaClient) {
 	handlers.CreateBookingHTTPHandler(app, bookingAPI).RegisterRoutes()
 	handlers.CreateCommentHTTPHandler(app, commentAPI).RegisterRoutes()
 	handlers.CreateRatingHTTPHandler(app, ratingAPI).RegisterRoutes()
+	handlers.CreateAuthHTTPHandler(app, authApi).RegisterRoutes()
 }

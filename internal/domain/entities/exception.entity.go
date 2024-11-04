@@ -7,6 +7,7 @@ const (
 	ExceptionCode_RessourceNotFound ExceptionCode = 1
 	ExceptionCode_BadInputFormat    ExceptionCode = 2
 	ExceptionCode_NotAllowedScope   ExceptionCode = 3
+	ExceptionCode_Unauthorized      ExceptionCode = 4
 )
 
 const (
@@ -14,6 +15,7 @@ const (
 	ExceptionMessage_RessourceNotFound string = "Ressource not found."
 	ExceptionMessage_BadInputFormat    string = "Bad input format."
 	ExceptionMessage_NotAllowedScope   string = "Not allowed scope."
+	ExceptionMessage_Unauthorized      string = "unauthorized."
 )
 
 type Exception struct {
