@@ -17,7 +17,8 @@ func Instanciate(app *gin.Engine, prisma *db.PrismaClient) {
 	commentRepository := repositories.CreateCommentRepository(prisma)
 	ratingRepository := repositories.CreateRatingRepository(prisma)
 
-	userService := services.CreateUserService(userRepository)
+	passwordService := services.NewPasswordService()
+	userService := services.CreateUserService(userRepository, passwordService)
 	accommodationService := services.CreateAccomodationService(accommodationRepository)
 	authorizationService := services.CreateAuthorizationsService(authorizationRepository)
 	bookingService := services.CreateBookingService(bookingRepository)

@@ -6,16 +6,24 @@ import (
 )
 
 type UserService struct {
-	output ports.UserOutput
+	output          ports.UserOutput
+	passwordService *PasswordService
 }
 
-func CreateUserService(output ports.UserOutput) *UserService {
+func CreateUserService(output ports.UserOutput, passwordService *PasswordService) *UserService {
 	return &UserService{
-		output: output,
+		output:          output,
+		passwordService: passwordService,
 	}
 }
 
 func (s *UserService) Create(data entities.User) (entities.User, *entities.Exception) {
+	hash, exception := s.passwordService.Hash(data.Password)
+	if exception != nil {
+		return entities.User{}, exception
+	}
+	data.Password = hash
+
 	return s.output.Create(data)
 }
 
