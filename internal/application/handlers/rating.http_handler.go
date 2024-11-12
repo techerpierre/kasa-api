@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/techerpierre/kasa-api/internal/application/dto"
@@ -11,14 +12,16 @@ import (
 )
 
 type RatingHTTPHandler struct {
-	app *gin.Engine
-	api ports.RatingInput
+	app              *gin.Engine
+	api              ports.RatingInput
+	authorizationAPI ports.AuthorizationsInput
 }
 
-func CreateRatingHTTPHandler(app *gin.Engine, api ports.RatingInput) *RatingHTTPHandler {
+func CreateRatingHTTPHandler(app *gin.Engine, api ports.RatingInput, authorizationAPI ports.AuthorizationsInput) *RatingHTTPHandler {
 	return &RatingHTTPHandler{
-		app: app,
-		api: api,
+		app:              app,
+		api:              api,
+		authorizationAPI: authorizationAPI,
 	}
 }
 
@@ -31,6 +34,23 @@ func (h *RatingHTTPHandler) RegisterRoutes() {
 }
 
 func (h *RatingHTTPHandler) Create(c *gin.Context) {
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	isAuthorized, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_CreateRating)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !isAuthorized {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
 	var body dto.RatingInputDTO
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -41,6 +61,8 @@ func (h *RatingHTTPHandler) Create(c *gin.Context) {
 
 	var ratingData entities.Rating
 	dto.PipeInputDTOInRating(&body, &ratingData)
+
+	ratingData.UserID = payloads.ID
 
 	rating, exception := h.api.Create(ratingData)
 
@@ -61,6 +83,32 @@ func (h *RatingHTTPHandler) Create(c *gin.Context) {
 
 func (h *RatingHTTPHandler) Update(c *gin.Context) {
 	id := c.Param("id")
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	isAuthorized, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_UpdateRating)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	rating, exception := h.api.FindOne(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !isAuthorized && payloads.ID != rating.UserID {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
 	var body dto.RatingInputDTO
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -72,7 +120,7 @@ func (h *RatingHTTPHandler) Update(c *gin.Context) {
 	var ratingData entities.Rating
 	dto.PipeInputDTOInRating(&body, &ratingData)
 
-	rating, exception := h.api.Update(id, ratingData)
+	rating, exception = h.api.Update(id, ratingData)
 
 	if exception != nil {
 		httpException, statusCode := dto.HTTPExceptionFromException(exception)
@@ -91,8 +139,33 @@ func (h *RatingHTTPHandler) Update(c *gin.Context) {
 
 func (h *RatingHTTPHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
 
-	exception := h.api.Delete(id)
+	isAuthorized, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_DeleteRating)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	rating, exception := h.api.FindOne(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !isAuthorized && payloads.ID != rating.UserID {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	exception = h.api.Delete(id)
 
 	if exception != nil {
 		httpException, statusCode := dto.HTTPExceptionFromException(exception)

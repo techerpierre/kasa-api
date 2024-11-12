@@ -27,6 +27,24 @@ model User {
 
 model Authorizations {
   id String @id
+  createAuthorization Boolean @default(false)
+  updateAuthorization Boolean @default(false)
+  deleteAuthorization Boolean @default(false)
+  createUser Boolean @default(false)
+  updateUser Boolean @default(false)
+  deleteUser Boolean @default(false)
+  createAccommodation Boolean @default(false)
+  updateAccommodation Boolean @default(false)
+  deleteAccommodation Boolean @default(false)
+  createBooking Boolean @default(false)
+  updateBooking Boolean @default(false)
+  deleteBooking Boolean @default(false)
+  createRating Boolean @default(false)
+  updateRating Boolean @default(false)
+  deleteRating Boolean @default(false)
+  createComment Boolean @default(false)
+  updateComment Boolean @default(false)
+  deleteComment Boolean @default(false)
   users User[]
 }
 

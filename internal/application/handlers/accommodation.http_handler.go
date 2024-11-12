@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/techerpierre/kasa-api/internal/application/dto"
@@ -11,14 +12,16 @@ import (
 )
 
 type AccomodationHTTPHandler struct {
-	app *gin.Engine
-	api ports.AccommodationInput
+	app              *gin.Engine
+	api              ports.AccommodationInput
+	authorizationAPI ports.AuthorizationsInput
 }
 
-func CreateAccomodationHTTPHandler(app *gin.Engine, api ports.AccommodationInput) *AccomodationHTTPHandler {
+func CreateAccomodationHTTPHandler(app *gin.Engine, api ports.AccommodationInput, authorizationAPI ports.AuthorizationsInput) *AccomodationHTTPHandler {
 	return &AccomodationHTTPHandler{
-		app: app,
-		api: api,
+		app:              app,
+		api:              api,
+		authorizationAPI: authorizationAPI,
 	}
 }
 
@@ -31,6 +34,23 @@ func (h *AccomodationHTTPHandler) RegisterRoutes() {
 }
 
 func (h *AccomodationHTTPHandler) Create(c *gin.Context) {
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	isAuthorized, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_CreateAccommodation)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !isAuthorized {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
 	var body dto.AccommodationInputDTO
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -41,6 +61,8 @@ func (h *AccomodationHTTPHandler) Create(c *gin.Context) {
 
 	var accommodationData entities.Accommodation
 	dto.PipeInputDTOInAccommodation(&body, &accommodationData)
+
+	accommodationData.UserID = payloads.ID
 
 	accommodation, exception := h.api.Create(accommodationData)
 
@@ -61,6 +83,32 @@ func (h *AccomodationHTTPHandler) Create(c *gin.Context) {
 
 func (h *AccomodationHTTPHandler) Update(c *gin.Context) {
 	id := c.Param("id")
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	isAuthorized, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_UpdateAccommodation)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	accommodation, exception := h.api.FindOne(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !isAuthorized && payloads.ID != accommodation.UserID {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
 	var body dto.AccommodationInputDTO
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -72,7 +120,7 @@ func (h *AccomodationHTTPHandler) Update(c *gin.Context) {
 	var accommodationData entities.Accommodation
 	dto.PipeInputDTOInAccommodation(&body, &accommodationData)
 
-	accommodation, exception := h.api.Update(id, accommodationData)
+	accommodation, exception = h.api.Update(id, accommodationData)
 
 	if exception != nil {
 		httpException, statusCode := dto.HTTPExceptionFromException(exception)
@@ -92,7 +140,33 @@ func (h *AccomodationHTTPHandler) Update(c *gin.Context) {
 func (h *AccomodationHTTPHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
-	exception := h.api.Delete(id)
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	isAuthorized, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_DeleteAccommodation)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	accommodation, exception := h.api.FindOne(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !isAuthorized && payloads.ID != accommodation.UserID {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	exception = h.api.Delete(id)
 
 	if exception != nil {
 		httpException, statusCode := dto.HTTPExceptionFromException(exception)

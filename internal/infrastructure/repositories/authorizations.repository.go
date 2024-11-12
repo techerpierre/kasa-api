@@ -23,6 +23,24 @@ func (r *AuthorizationsRepository) Create(data entities.Authorizations) (entitie
 
 	result, err := r.prisma.Authorizations.CreateOne(
 		db.Authorizations.ID.SetIfPresent(helpers.NilIfEmptyString(data.ID)),
+		db.Authorizations.CreateAuthorization.Set(data.CreateAuthorization),
+		db.Authorizations.UpdateAuthorization.Set(data.UpdateAuthorization),
+		db.Authorizations.DeleteAuthorization.Set(data.UpdateAuthorization),
+		db.Authorizations.CreateUser.Set(data.CreateUser),
+		db.Authorizations.UpdateUser.Set(data.UpdateUser),
+		db.Authorizations.DeleteUser.Set(data.DeleteUser),
+		db.Authorizations.CreateAccommodation.Set(data.CreateAccommodation),
+		db.Authorizations.UpdateAccommodation.Set(data.UpdateAccommodation),
+		db.Authorizations.DeleteAccommodation.Set(data.DeleteAccommodation),
+		db.Authorizations.CreateBooking.Set(data.CreateBooking),
+		db.Authorizations.UpdateBooking.Set(data.UpdateBooking),
+		db.Authorizations.DeleteBooking.Set(data.DeleteBooking),
+		db.Authorizations.CreateRating.Set(data.CreateRating),
+		db.Authorizations.UpdateRating.Set(data.UpdateRating),
+		db.Authorizations.DeleteRating.Set(data.DeleteRating),
+		db.Authorizations.CreateComment.Set(data.CreateComment),
+		db.Authorizations.UpdateComment.Set(data.UpdateComment),
+		db.Authorizations.DeleteComment.Set(data.DeleteComment),
 	).Exec(context.Background())
 
 	if err != nil {
@@ -33,14 +51,51 @@ func (r *AuthorizationsRepository) Create(data entities.Authorizations) (entitie
 	}
 
 	return entities.Authorizations{
-		ID: result.ID,
+		ID:                  result.ID,
+		CreateAuthorization: result.CreateAuthorization,
+		UpdateAuthorization: result.UpdateAuthorization,
+		DeleteAuthorization: result.DeleteAuthorization,
+		CreateUser:          result.CreateUser,
+		UpdateUser:          result.UpdateUser,
+		DeleteUser:          result.DeleteUser,
+		CreateAccommodation: result.CreateAccommodation,
+		UpdateAccommodation: result.UpdateAccommodation,
+		DeleteAccommodation: result.DeleteAccommodation,
+		CreateBooking:       result.CreateBooking,
+		UpdateBooking:       result.UpdateBooking,
+		DeleteBooking:       result.DeleteBooking,
+		CreateRating:        result.CreateRating,
+		UpdateRating:        result.UpdateRating,
+		DeleteRating:        result.DeleteRating,
+		CreateComment:       result.CreateComment,
+		UpdateComment:       result.UpdateComment,
+		DeleteComment:       result.DeleteComment,
 	}, nil
 }
 
 func (r *AuthorizationsRepository) Update(id string, data entities.Authorizations) (entities.Authorizations, *entities.Exception) {
 	result, err := r.prisma.Authorizations.FindUnique(
 		db.Authorizations.ID.Equals(id),
-	).Update().Exec(context.Background())
+	).Update(
+		db.Authorizations.CreateAuthorization.Set(data.CreateAuthorization),
+		db.Authorizations.UpdateAuthorization.Set(data.UpdateAuthorization),
+		db.Authorizations.DeleteAuthorization.Set(data.UpdateAuthorization),
+		db.Authorizations.CreateUser.Set(data.CreateUser),
+		db.Authorizations.UpdateUser.Set(data.UpdateUser),
+		db.Authorizations.DeleteUser.Set(data.DeleteUser),
+		db.Authorizations.CreateAccommodation.Set(data.CreateAccommodation),
+		db.Authorizations.UpdateAccommodation.Set(data.UpdateAccommodation),
+		db.Authorizations.DeleteAccommodation.Set(data.DeleteAccommodation),
+		db.Authorizations.CreateBooking.Set(data.CreateBooking),
+		db.Authorizations.UpdateBooking.Set(data.UpdateBooking),
+		db.Authorizations.DeleteBooking.Set(data.DeleteBooking),
+		db.Authorizations.CreateRating.Set(data.CreateRating),
+		db.Authorizations.UpdateRating.Set(data.UpdateRating),
+		db.Authorizations.DeleteRating.Set(data.DeleteRating),
+		db.Authorizations.CreateComment.Set(data.CreateComment),
+		db.Authorizations.UpdateComment.Set(data.UpdateComment),
+		db.Authorizations.DeleteComment.Set(data.DeleteComment),
+	).Exec(context.Background())
 
 	if err != nil {
 		if err == db.ErrNotFound {
@@ -57,7 +112,25 @@ func (r *AuthorizationsRepository) Update(id string, data entities.Authorization
 	}
 
 	return entities.Authorizations{
-		ID: result.ID,
+		ID:                  result.ID,
+		CreateAuthorization: result.CreateAuthorization,
+		UpdateAuthorization: result.UpdateAuthorization,
+		DeleteAuthorization: result.DeleteAuthorization,
+		CreateUser:          result.CreateUser,
+		UpdateUser:          result.UpdateUser,
+		DeleteUser:          result.DeleteUser,
+		CreateAccommodation: result.CreateAccommodation,
+		UpdateAccommodation: result.UpdateAccommodation,
+		DeleteAccommodation: result.DeleteAccommodation,
+		CreateBooking:       result.CreateBooking,
+		UpdateBooking:       result.UpdateBooking,
+		DeleteBooking:       result.DeleteBooking,
+		CreateRating:        result.CreateRating,
+		UpdateRating:        result.UpdateRating,
+		DeleteRating:        result.DeleteRating,
+		CreateComment:       result.CreateComment,
+		UpdateComment:       result.UpdateComment,
+		DeleteComment:       result.DeleteComment,
 	}, nil
 }
 
@@ -112,7 +185,25 @@ func (r *AuthorizationsRepository) List() ([]entities.Authorizations, int, *enti
 
 	for _, result := range results {
 		authorizations = append(authorizations, entities.Authorizations{
-			ID: result.ID,
+			ID:                  result.ID,
+			CreateAuthorization: result.CreateAuthorization,
+			UpdateAuthorization: result.UpdateAuthorization,
+			DeleteAuthorization: result.DeleteAuthorization,
+			CreateUser:          result.CreateUser,
+			UpdateUser:          result.UpdateUser,
+			DeleteUser:          result.DeleteUser,
+			CreateAccommodation: result.CreateAccommodation,
+			UpdateAccommodation: result.UpdateAccommodation,
+			DeleteAccommodation: result.DeleteAccommodation,
+			CreateBooking:       result.CreateBooking,
+			UpdateBooking:       result.UpdateBooking,
+			DeleteBooking:       result.DeleteBooking,
+			CreateRating:        result.CreateRating,
+			UpdateRating:        result.UpdateRating,
+			DeleteRating:        result.DeleteRating,
+			CreateComment:       result.CreateComment,
+			UpdateComment:       result.UpdateComment,
+			DeleteComment:       result.DeleteComment,
 		})
 	}
 
@@ -139,6 +230,24 @@ func (r *AuthorizationsRepository) FindOne(id string) (entities.Authorizations, 
 	}
 
 	return entities.Authorizations{
-		ID: result.ID,
+		ID:                  result.ID,
+		CreateAuthorization: result.CreateAuthorization,
+		UpdateAuthorization: result.UpdateAuthorization,
+		DeleteAuthorization: result.DeleteAuthorization,
+		CreateUser:          result.CreateUser,
+		UpdateUser:          result.UpdateUser,
+		DeleteUser:          result.DeleteUser,
+		CreateAccommodation: result.CreateAccommodation,
+		UpdateAccommodation: result.UpdateAccommodation,
+		DeleteAccommodation: result.DeleteAccommodation,
+		CreateBooking:       result.CreateBooking,
+		UpdateBooking:       result.UpdateBooking,
+		DeleteBooking:       result.DeleteBooking,
+		CreateRating:        result.CreateRating,
+		UpdateRating:        result.UpdateRating,
+		DeleteRating:        result.DeleteRating,
+		CreateComment:       result.CreateComment,
+		UpdateComment:       result.UpdateComment,
+		DeleteComment:       result.DeleteComment,
 	}, nil
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/techerpierre/kasa-api/internal/application/dto"
@@ -30,6 +31,23 @@ func (h *AuthorizationHTTPHandler) RegisterRoutes() {
 }
 
 func (h *AuthorizationHTTPHandler) Create(c *gin.Context) {
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	IsAuthorized, _, exception := h.api.IsAuthorized(token, entities.Authorization_CreateAuthorization)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !IsAuthorized {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
 	var body dto.AuthorizationsInputDTO
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -60,6 +78,22 @@ func (h *AuthorizationHTTPHandler) Create(c *gin.Context) {
 
 func (h *AuthorizationHTTPHandler) Update(c *gin.Context) {
 	id := c.Param("id")
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	IsAuthorized, _, exception := h.api.IsAuthorized(token, entities.Authorization_UpdateAuthorization)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !IsAuthorized {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
 
 	var body dto.AuthorizationsInputDTO
 
@@ -92,7 +126,24 @@ func (h *AuthorizationHTTPHandler) Update(c *gin.Context) {
 func (h *AuthorizationHTTPHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
-	exception := h.api.Delete(id)
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	IsAuthorized, _, exception := h.api.IsAuthorized(token, entities.Authorization_DeleteAuthorization)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !IsAuthorized {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	exception = h.api.Delete(id)
 
 	if exception != nil {
 		httpException, statusCode := dto.HTTPExceptionFromException(exception)

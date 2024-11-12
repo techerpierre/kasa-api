@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/techerpierre/kasa-api/internal/application/dto"
@@ -11,14 +12,16 @@ import (
 )
 
 type CommentHTTPHandler struct {
-	app *gin.Engine
-	api ports.CommentInput
+	app              *gin.Engine
+	api              ports.CommentInput
+	authorizationAPI ports.AuthorizationsInput
 }
 
-func CreateCommentHTTPHandler(app *gin.Engine, api ports.CommentInput) *CommentHTTPHandler {
+func CreateCommentHTTPHandler(app *gin.Engine, api ports.CommentInput, authorizationAPI ports.AuthorizationsInput) *CommentHTTPHandler {
 	return &CommentHTTPHandler{
-		app: app,
-		api: api,
+		app:              app,
+		api:              api,
+		authorizationAPI: authorizationAPI,
 	}
 }
 
@@ -31,6 +34,22 @@ func (h *CommentHTTPHandler) RegisterRoutes() {
 }
 
 func (h *CommentHTTPHandler) Create(c *gin.Context) {
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	isAuthorized, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_CreateComment)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !isAuthorized {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
 	var body dto.CommentInputDTO
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -41,6 +60,8 @@ func (h *CommentHTTPHandler) Create(c *gin.Context) {
 
 	var commentData entities.Comment
 	dto.PipeInputDTOInComment(&body, &commentData)
+
+	commentData.UserID = payloads.ID
 
 	comment, exception := h.api.Create(commentData)
 
@@ -61,6 +82,31 @@ func (h *CommentHTTPHandler) Create(c *gin.Context) {
 
 func (h *CommentHTTPHandler) Update(c *gin.Context) {
 	id := c.Param("id")
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	isAuthorized, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_UpdateComment)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	comment, exception := h.api.FindOne(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !isAuthorized && payloads.ID != comment.UserID {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
 
 	var body dto.CommentInputDTO
 
@@ -73,7 +119,7 @@ func (h *CommentHTTPHandler) Update(c *gin.Context) {
 	var commentData entities.Comment
 	dto.PipeInputDTOInComment(&body, &commentData)
 
-	comment, exception := h.api.Update(id, commentData)
+	comment, exception = h.api.Update(id, commentData)
 
 	if exception != nil {
 		httpException, statusCode := dto.HTTPExceptionFromException(exception)
@@ -92,8 +138,33 @@ func (h *CommentHTTPHandler) Update(c *gin.Context) {
 
 func (h *CommentHTTPHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
 
-	exception := h.api.Delete(id)
+	isAuthorized, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_DeleteComment)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	comment, exception := h.api.FindOne(id)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !isAuthorized && payloads.ID != comment.UserID {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	exception = h.api.Delete(id)
 
 	if exception != nil {
 		httpException, statusCode := dto.HTTPExceptionFromException(exception)

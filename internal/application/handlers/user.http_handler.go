@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/techerpierre/kasa-api/internal/application/dto"
@@ -11,14 +12,16 @@ import (
 )
 
 type UserHTTPHandler struct {
-	app *gin.Engine
-	api ports.UserInput
+	app              *gin.Engine
+	api              ports.UserInput
+	authorizationAPI ports.AuthorizationsInput
 }
 
-func CreateUserHTTPHandler(app *gin.Engine, api ports.UserInput) *UserHTTPHandler {
+func CreateUserHTTPHandler(app *gin.Engine, api ports.UserInput, authorizationAPI ports.AuthorizationsInput) *UserHTTPHandler {
 	return &UserHTTPHandler{
-		app: app,
-		api: api,
+		app:              app,
+		api:              api,
+		authorizationAPI: authorizationAPI,
 	}
 }
 
@@ -62,6 +65,23 @@ func (h *UserHTTPHandler) Create(c *gin.Context) {
 
 func (h *UserHTTPHandler) Update(c *gin.Context) {
 	id := c.Param("id")
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	isAuthorized, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_UpdateUser)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !isAuthorized && payloads.ID != id {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
 	var body dto.UserInputDTO
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -93,7 +113,24 @@ func (h *UserHTTPHandler) Update(c *gin.Context) {
 func (h *UserHTTPHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
-	exception := h.api.Delete(id)
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	isAuthorized, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_DeleteUser)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	if !isAuthorized && payloads.ID != id {
+		response := dto.CreateResponse(http.StatusUnauthorized, gin.H{"error": entities.ExceptionMessage_Unauthorized}, nil)
+		c.JSON(response.StatusCode, response)
+		return
+	}
+
+	exception = h.api.Delete(id)
 
 	if exception != nil {
 		httpException, statusCode := dto.HTTPExceptionFromException(exception)
@@ -180,6 +217,31 @@ func (h *UserHTTPHandler) FindOne(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (*UserHTTPHandler) Profile(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Method not implemented."})
+func (h *UserHTTPHandler) Profile(c *gin.Context) {
+	token := strings.Split(c.GetHeader("Authorization"), " ")[1]
+
+	_, payloads, exception := h.authorizationAPI.IsAuthorized(token, entities.Authorization_NoAuthorization)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	user, exception := h.api.FindOne(payloads.ID)
+
+	if exception != nil {
+		httpException, statusCode := dto.HTTPExceptionFromException(exception)
+		response := dto.CreateResponse(statusCode, httpException, nil)
+		c.JSON(statusCode, response)
+		return
+	}
+
+	var responseData dto.UserDTO
+	dto.PipeUserInDTO(&user, &responseData)
+
+	response := dto.CreateResponse(http.StatusOK, responseData, nil)
+
+	c.JSON(http.StatusOK, response)
 }

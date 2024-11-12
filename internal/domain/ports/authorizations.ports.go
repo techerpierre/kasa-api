@@ -16,4 +16,5 @@ type AuthorizationsInput interface {
 	Delete(id string) *entities.Exception
 	List() ([]entities.Authorizations, int, *entities.Exception)
 	FindOne(id string) (entities.Authorizations, *entities.Exception)
+	IsAuthorized(token string, authorization entities.AuthorizationType) (bool, entities.Payloads, *entities.Exception)
 }

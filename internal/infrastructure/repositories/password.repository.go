@@ -64,7 +64,6 @@ func (s *PasswordRepository) Hash(password string) (string, *entities.Exception)
 func (s *PasswordRepository) Compare(plainPassword, hash string) (bool, *entities.Exception) {
 	p, salt, decodedHash, err := s.decodeHash(hash)
 	if err != nil {
-		fmt.Println("------------------- error -------------------")
 		return false, entities.CreateException(
 			entities.ExceptionCode_NotHandledError,
 			entities.ExceptionMessage_NotHandledError,

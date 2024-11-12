@@ -34,3 +34,7 @@ func (a *AuthorizationAPI) List() ([]entities.Authorizations, int, *entities.Exc
 func (a *AuthorizationAPI) FindOne(id string) (entities.Authorizations, *entities.Exception) {
 	return a.service.FindOne(id)
 }
+
+func (a *AuthorizationAPI) IsAuthorized(token string, authorization entities.AuthorizationType) (bool, entities.Payloads, *entities.Exception) {
+	return a.service.IsAuthorized(token, authorization)
+}
