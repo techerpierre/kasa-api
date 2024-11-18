@@ -26,6 +26,9 @@ services:
       DATABASE_URL: "postgresql://kasa:kasapassword@postgres:5432/kasa?schema=public"
     depends_on:
       - postgres
+    volumes:
+      - file-store:/usr/data
 
 volumes:
   kasa-postgres-data:
+  file-store:
